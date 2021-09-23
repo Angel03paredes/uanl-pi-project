@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -27,6 +29,8 @@ namespace PI
 
         BitmapImage play = new BitmapImage(new Uri("./image/play.png", UriKind.Relative));
         BitmapImage pause = new BitmapImage(new Uri("./image/stop.png", UriKind.Relative));
+
+        Bitmap bitmap;
 
         public MainWindow()
         {
@@ -79,31 +83,38 @@ namespace PI
             
             if (success == true)
             {
+                string selectedFileName = dlg.FileName;
                 string ext = System.IO.Path.GetExtension(dlg.FileName); 
                 if(ext == ".mp4")
                 {
                     HandlerControlers(Visibility.Visible);
+                    MediaEdit.Source = new Uri(selectedFileName);
+                    MediaEdit.Play();
                 }
-                string selectedFileName = dlg.FileName;
-
-                MediaEdit.Source = new Uri(selectedFileName);
-                MediaEdit.Play();
+                else
+                {
+                    bitmap = new Bitmap(selectedFileName);
+                     BitmapImage bitmapi = new BitmapImage();
+                    bitmapi.BeginInit();
+                    bitmapi.UriSource = new Uri(selectedFileName);
+                    bitmapi.EndInit();
+                    ImageEdit.Visibility = Visibility.Visible;
+                    ImageEdit.Source = bitmapi;
+                }
+                
             } 
         }
 
         private void SaveClick(object sender,RoutedEventArgs e)
         {
-            //Stream myStream;
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Filter = "Files (*.jpg;*.PNG;*.mp4)|*.jpg;*.PNG;*.mp4|All Files (*.*)|*.*";
-            dlg.RestoreDirectory = true;
+            
+            dlg.RestoreDirectory = false;
             bool? success = dlg.ShowDialog();
             if (success == true)
-            {
-
-                // byte[] imageBytes = MediaEdit.
-                // File.WriteAllBytes(dlg.FileName, imageBytes);
-                var file = MediaEdit.Source;
+            { 
+                //bitmap.Save(dlg.FileName, ImageFormat.Png);
 
             }
 
@@ -155,6 +166,42 @@ namespace PI
             BtnPlay.Visibility = visibility;
             BtnReplay.Visibility = visibility;
         }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem typeItem = (ComboBoxItem)AddFilters.SelectedItem;
+            var value = typeItem.Content;
+            Filtros filtros = new Filtros();
+            switch (value)
+            {
+                case "Sepia":
+                    
+                    Bitmap bmpSepia =  filtros.Sepia(bitmap);
+
+                    ImageEdit.Source = Helpers.Convert(bmpSepia);
+                   
+                    break;
+
+                case "Glitch":
+                    filtros.Glitch();
+                    break;
+
+                case "Escala de grises":
+                    filtros.EscalaDeGrises();
+                    break;
+
+                case "Sobel":
+                    filtros.Sobel();
+                    break;
+
+                case "Laplaciano":
+                    filtros.Laplaciano();
+                    break;
+            }
+        }
+
+      
+
 
     }
 }

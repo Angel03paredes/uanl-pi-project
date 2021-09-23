@@ -315,13 +315,13 @@
         <!-- Nav -->
         <Border Grid.Row="1" Background="{StaticResource Secondary}" >
             <StackPanel Orientation="Horizontal"   >
-                <ComboBox  Margin="10,0,0,0"   Width="170"  >
+                <ComboBox  SelectionChanged="ComboBox_SelectionChanged" Margin="10,0,0,0" Name="AddFilters"   Width="170"  >
                     <ComboBoxItem  IsSelected="True" IsEnabled="False">Agregar Filtro</ComboBoxItem>
                     <ComboBoxItem>Sepia</ComboBoxItem>
-                    <ComboBoxItem>Negativo</ComboBoxItem>
                     <ComboBoxItem>Glitch</ComboBoxItem>
+                    <ComboBoxItem>Escala de grises</ComboBoxItem>
                     <ComboBoxItem>Sobel</ComboBoxItem>
-                    <ComboBoxItem>Blanco y negro</ComboBoxItem>
+                    <ComboBoxItem>Laplaciano</ComboBoxItem>
                 </ComboBox>
                 <Button Style="{StaticResource BtnNav}" Width="120" Click="Importar_Click" Content="Importar"/>
                 <Button  Style="{StaticResource BtnNav}" Click="BtnCamara_Click"  Width="120" Content="Camara"/>
@@ -336,7 +336,8 @@
         </Border>
         <!-- Image -->
         <Grid Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" Background="{StaticResource Primary}">
-            <MediaElement  LoadedBehavior="Manual" Name="MediaEdit"  Height="296" Width="444"  />
+            <MediaElement Visibility="Hidden"  LoadedBehavior="Manual" Name="MediaEdit"  Height="296" Width="444"  />
+            <Image Visibility="Hidden"  Name="ImageEdit"  Height="296" Width="444"  />
             <Slider Name="TimeLine"  HorizontalAlignment="Center" Margin="0,0,0,50" ValueChanged="SeekToMediaPosition" VerticalAlignment="Bottom" Width="444"/>
             <Button Name="BtnPlay" Click="Stop_Click"  Style="{StaticResource BtnWindow}" Width="30" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-40,0,0,20" >
                 <Image Name="BtnStopPlay"  Source="./image/stop.png"/>
