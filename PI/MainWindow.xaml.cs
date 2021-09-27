@@ -1,4 +1,6 @@
-﻿using Microsoft.Win32;
+﻿using AForge.Video;
+using AForge.Video.DirectShow;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,6 +21,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Emgu.CV;
+using Emgu.CV.Structure;
+using System.Windows.Forms;
+using System.Windows.Forms.Integration;
 
 namespace PI
 {
@@ -26,17 +33,30 @@ namespace PI
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        //private IVideoSource _videoSource;
         BitmapImage play = new BitmapImage(new Uri("./image/play.png", UriKind.Relative));
         BitmapImage pause = new BitmapImage(new Uri("./image/stop.png", UriKind.Relative));
 
         Bitmap bitmap;
 
+        VideoCapture capture;
+        double TotalFrame;
+        double Fps;
+        int FrameNo;
+        Boolean isVideo = false;
+        Boolean isVideoPause = false;
+        Boolean saveVideo = false;
+        System.Drawing.Size vp;
         public MainWindow()
         {
             InitializeComponent();
             HandlerControlers(Visibility.Hidden);
-          
+            //ShowHistograma();
+            WindowsFormsHost host = new WindowsFormsHost();
+            System.Windows.Forms.Button btn = new System.Windows.Forms.Button();
+            btn.Text = "mytnsi";
+            host.Child = btn;
+            grid1.Children.Add(host);
         }
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -46,20 +66,20 @@ namespace PI
 
         private void ButtonMin_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.MainWindow.WindowState = WindowState.Minimized;
+           System.Windows.Application.Current.MainWindow.WindowState = WindowState.Minimized;
         }
 
         private void ButtonMax_Click(object sender, RoutedEventArgs e)
         {
-            if (Application.Current.MainWindow.WindowState == WindowState.Normal)
-                Application.Current.MainWindow.WindowState = WindowState.Maximized;
+            if (System.Windows.Application.Current.MainWindow.WindowState == WindowState.Normal)
+                System.Windows.Application.Current.MainWindow.WindowState = WindowState.Maximized;
             else
-                Application.Current.MainWindow.WindowState = WindowState.Normal;
+                System.Windows.Application.Current.MainWindow.WindowState = WindowState.Normal;
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown();
         }
 
         private void BtnManual_Click(object sender,RoutedEventArgs e)
@@ -75,7 +95,7 @@ namespace PI
 
         private void Importar_Click(object sender, RoutedEventArgs e)
         {   
-            OpenFileDialog dlg = new OpenFileDialog();
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.InitialDirectory = "c:\\";
             dlg.Filter = "Files (*.jpg;*.PNG;*.mp4)|*.jpg;*.PNG;*.mp4|All Files (*.*)|*.*";
             dlg.RestoreDirectory = true;
@@ -85,84 +105,158 @@ namespace PI
             {
                 string selectedFileName = dlg.FileName;
                 string ext = System.IO.Path.GetExtension(dlg.FileName); 
-                if(ext == ".mp4")
+                if(ext == ".mp4" || ext == ".mpeg")
                 {
-                    HandlerControlers(Visibility.Visible);
-                    MediaEdit.Source = new Uri(selectedFileName);
-                    MediaEdit.Play();
+                    try
+                    {
+                        isVideo = true;
+                        saveVideo = true;
+                        capture = new VideoCapture(selectedFileName);
+                        var vpSet = capture.QueryFrame();
+                        vp = new System.Drawing.Size(vpSet.Width, vpSet.Height);
+                        // Mat m = new Mat();
+                        //capture.Read(m);
+
+                        //Bitmap bmpi = m.ToImage<Bgr, Byte>().ToBitmap();
+                        //ImageEdit.Source = Helpers.Convert(m.ToBitmap());
+
+                        TotalFrame = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameCount);
+                        Fps = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps);
+                        HandlerControlers(Visibility.Visible);
+                        ReadAllFrames();
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.MessageBox.Show(ex.Message);
+                    }
+
                 }
                 else
                 {
+                    isVideo = false;
+                    saveVideo = false;
                     bitmap = new Bitmap(selectedFileName);
-                     BitmapImage bitmapi = new BitmapImage();
-                    bitmapi.BeginInit();
-                    bitmapi.UriSource = new Uri(selectedFileName);
-                    bitmapi.EndInit();
-                    ImageEdit.Visibility = Visibility.Visible;
-                    ImageEdit.Source = bitmapi;
+                    HandlerControlers(Visibility.Hidden);
+                    ImageEdit.Source = new BitmapImage(new Uri(selectedFileName));
                 }
                 
             } 
         }
 
-        private void SaveClick(object sender,RoutedEventArgs e)
+        private async void ReadAllFrames()
         {
-            SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Filter = "Files (*.jpg;*.PNG;*.mp4)|*.jpg;*.PNG;*.mp4|All Files (*.*)|*.*";
-            
-            dlg.RestoreDirectory = false;
-            bool? success = dlg.ShowDialog();
-            if (success == true)
-            { 
-                //bitmap.Save(dlg.FileName, ImageFormat.Png);
 
+            Mat m = new Mat();
+            int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
+            while (isVideo == true && FrameNo < TotalFrame)
+            {
+                FrameNo += mult; //Convert.ToInt16(numericUpDown1.Value);
+               
+                capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, FrameNo);
+                
+                capture.Read(m);
+                if(m.GetData() != null)
+                {
+                    Bitmap bmpi = m.ToImage<Bgr, Byte>().ToBitmap();
+                    ImageEdit.Source = Helpers.Convert(bmpi);
+                    await Task.Delay(1000 / Convert.ToInt16(Fps));
+                }
+                else
+                {
+                    isVideo = false;
+                    
+                }
             }
-
         }
 
-        private void SeekToMediaPosition(object sender, RoutedPropertyChangedEventArgs<double> args)
+        
+
+        private async void SaveClick(object sender,RoutedEventArgs e)
         {
-            int SliderValue = (int)TimeLine.Value;
-            TimeSpan ts = new TimeSpan(0, 0, 0, 0, SliderValue);
-            MediaEdit.Position = ts;
-           
+            try
+            {
+                await Task.Run(() =>
+                {
+
+                    Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+                    dlg.Filter = "Files (*.jpg;*.PNG;*.mp4)|*.jpg;*.PNG;*.mp4|All Files (*.*)|*.*";
+
+                    dlg.RestoreDirectory = false;
+                    bool? success = dlg.ShowDialog();
+                    if (success == true)
+                    {
+                        if (!saveVideo)
+                            bitmap.Save(dlg.FileName, ImageFormat.Png);
+                        else
+                        {
+
+                            VideoWriter VideoW = new VideoWriter(dlg.FileName,
+                                           VideoWriter.Fourcc('M', 'P', '4', 'V'),
+                                            Convert.ToInt32(Fps),
+                                          new System.Drawing.Size(vp.Width, vp.Height),
+                                           true);
+                            Mat m = new Mat();
+                            var si = 0;
+                            int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
+                            while (si < TotalFrame)
+                            {
+                                si += 1;
+
+                                capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, si);
+                                capture.Read(m);
+                                if (m.GetData() != null)
+                                {
+                                    VideoW.Write(m);
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("Error al guardar imagen " + ex.ToString());
+            }
         }
+
+       
 
        private void Stop_Click(object sender, RoutedEventArgs e)
         {
-            var state = GetMediaState(MediaEdit);
-            if ( state == MediaState.Pause )
+            if (isVideoPause)
             {
-                MediaEdit.Play();
                 BtnStopPlay.Source = pause;
+                isVideo = true;
+                isVideoPause = false;
+                ReadAllFrames();
             }
             else
             {
-                MediaEdit.Pause();
                 BtnStopPlay.Source = play;
+                isVideo = false;
+                isVideoPause = true;
             }
+          
         }
 
-        private MediaState GetMediaState(MediaElement myMedia)
-        {
-            FieldInfo hlp = typeof(MediaElement).GetField("_helper", BindingFlags.NonPublic | BindingFlags.Instance);
-            object helperObject = hlp.GetValue(myMedia);
-            FieldInfo stateField = helperObject.GetType().GetField("_currentState", BindingFlags.NonPublic | BindingFlags.Instance);
-            MediaState state = (MediaState)stateField.GetValue(helperObject);
-            return state;
-        }
+    
 
 
         private void Reload_Click(object sender, RoutedEventArgs e)
         {
             BtnStopPlay.Source = pause;
-            MediaEdit.Stop();
-            MediaEdit.Play();
+            isVideoPause = false;
+            isVideo = true;
+            FrameNo = 0;
+            ReadAllFrames();
         }
 
         private void HandlerControlers( Visibility visibility)
         {
-            TimeLine.Visibility = visibility;
             BtnPlay.Visibility = visibility;
             BtnReplay.Visibility = visibility;
         }
@@ -177,7 +271,7 @@ namespace PI
                 case "Sepia":
                     
                     Bitmap bmpSepia =  filtros.Sepia(bitmap);
-
+                    bitmap = bmpSepia;
                     ImageEdit.Source = Helpers.Convert(bmpSepia);
                    
                     break;
@@ -187,7 +281,9 @@ namespace PI
                     break;
 
                 case "Escala de grises":
-                    filtros.EscalaDeGrises();
+                    Bitmap bmpEdG = filtros.EscalaDeGrises(bitmap);
+                    bitmap = bmpEdG;
+                    ImageEdit.Source = Helpers.Convert(bmpEdG);
                     break;
 
                 case "Sobel":
@@ -200,7 +296,43 @@ namespace PI
             }
         }
 
-      
+
+        private void ShowHistograma()
+        {
+            float[] BlueHist;
+            float[] GreenHist;
+            float[] RedHist;
+
+            Image<Bgr, Byte> imgHist = new Image<Bgr, byte>("C:/Users/angel/Desktop/conejitobonito.jpg");
+
+            DenseHistogram Histo = new DenseHistogram(255, new RangeF(0, 255));
+
+            Image<Gray, Byte> img2Blue = imgHist[0];
+            Image<Gray, Byte> img2Green = imgHist[1];
+            Image<Gray, Byte> img2Red = imgHist[2];
+        
+            // Create the MaskedTextBox control.
+
+
+            // Assign the MaskedTextBox control as the host control's child.
+
+            // Add the interop host control to the Grid
+            // control's collection of child controls.
+
+            //  HistogramBox1.ClearHistogram();
+            //  HistogramBox1.GenerateHistograms(img2Red, 256);
+            //  HistogramBox1.Refresh();
+
+            // Histo.Calculate(new Image<Gray, Byte>[] { img2Blue}, true, null);
+            //The data is here
+            //Histo.MatND.ManagedArray
+            //BlueHist = new float[256];
+            // Histo.Calculate<Byte>(new Image<Gray, byte>[] { img2Blue }, true, null); 
+            // Histo.MatND.ManagedArray.CopyTo(BlueHist, 0);
+
+            // Histo.Clear();
+
+        }
 
 
     }

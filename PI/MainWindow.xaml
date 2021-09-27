@@ -3,6 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        
+       
         xmlns:local="clr-namespace:PI"
         mc:Ignorable="d"
         Title="MainWindow" Height="645" Width="1200"
@@ -292,6 +294,7 @@
         </Style>
 
     </Window.Resources>
+ 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -306,6 +309,7 @@
 
         <Border MouseDown="Window_MouseDown" Grid.Row="0" Grid.ColumnSpan="2" Background="{StaticResource Primary}">
             <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
+                <Grid Name="grid1"/>
                 <Button Click="ButtonMin_Click" Content="―"  Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" ></Button>
                 <Button Content="▢" Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" Click="ButtonMax_Click"  ></Button>
                 <Button Content="🗙"  Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" Click="ButtonClose_Click"  ></Button>
@@ -314,6 +318,7 @@
 
         <!-- Nav -->
         <Border Grid.Row="1" Background="{StaticResource Secondary}" >
+            
             <StackPanel Orientation="Horizontal"   >
                 <ComboBox  SelectionChanged="ComboBox_SelectionChanged" Margin="10,0,0,0" Name="AddFilters"   Width="170"  >
                     <ComboBoxItem  IsSelected="True" IsEnabled="False">Agregar Filtro</ComboBoxItem>
@@ -336,9 +341,8 @@
         </Border>
         <!-- Image -->
         <Grid Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" Background="{StaticResource Primary}">
-            <MediaElement Visibility="Hidden"  LoadedBehavior="Manual" Name="MediaEdit"  Height="296" Width="444"  />
-            <Image Visibility="Hidden"  Name="ImageEdit"  Height="296" Width="444"  />
-            <Slider Name="TimeLine"  HorizontalAlignment="Center" Margin="0,0,0,50" ValueChanged="SeekToMediaPosition" VerticalAlignment="Bottom" Width="444"/>
+
+            <Image   Name="ImageEdit"  Height="296" Width="444"  />
             <Button Name="BtnPlay" Click="Stop_Click"  Style="{StaticResource BtnWindow}" Width="30" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-40,0,0,20" >
                 <Image Name="BtnStopPlay"  Source="./image/stop.png"/>
             </Button>
@@ -349,8 +353,8 @@
 
         </Grid>
         <!-- Filtros Histograma -->
-        <Border Grid.Row="2" Grid.Column="1" Margin="10" CornerRadius="10" Background="{StaticResource Secondary}">
-            <TextBlock HorizontalAlignment="Center" Text="Histograma" FontSize="14" Foreground="{StaticResource Font3}" />
+        <Border  Grid.Row="2" Grid.Column="1" Margin="10" CornerRadius="10" Background="{StaticResource Secondary}">
+         
         </Border>
         <!-- Filtros -->
         <Border Grid.Row="3" Grid.Column="1"  Margin="10" CornerRadius="10" Background="{StaticResource Secondary}">

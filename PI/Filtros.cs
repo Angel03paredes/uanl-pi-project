@@ -13,11 +13,7 @@ namespace PI
         {
             int width = bitmap.Width;
             int height = bitmap.Height;
-
-            //color of pixel
             Color p;
-
-            //sepia
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -74,9 +70,25 @@ namespace PI
         {
             //TODO glitch Filter
         }
-        public void EscalaDeGrises()
+        public Bitmap EscalaDeGrises(Bitmap bitmap)
         {
-            //TODO escala de grises Filter
+            int width = bitmap.Width;
+            int height = bitmap.Height;
+            Color p;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Color c = bitmap.GetPixel(x, y);
+
+                    int r = c.R;
+                    int g = c.G;
+                    int b = c.B;
+                    int avg = (r + g + b) / 3;
+                    bitmap.SetPixel(x, y, Color.FromArgb(avg, avg, avg));
+                }
+            }
+            return bitmap;
         }
         public void Sobel()
         {
