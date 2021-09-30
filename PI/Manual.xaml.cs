@@ -22,6 +22,7 @@ namespace PI
         public Manual()
         {
             InitializeComponent();
+           
         }
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {

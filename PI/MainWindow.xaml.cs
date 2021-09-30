@@ -23,6 +23,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Emgu.CV;
 using Emgu.CV.Structure;
+using Emgu.CV.UI;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 
@@ -36,8 +37,12 @@ namespace PI
         //private IVideoSource _videoSource;
         BitmapImage play = new BitmapImage(new Uri("./image/play.png", UriKind.Relative));
         BitmapImage pause = new BitmapImage(new Uri("./image/stop.png", UriKind.Relative));
-
+      
+        HistogramBox histogramR = new HistogramBox();
+        HistogramBox histogramG = new HistogramBox();
+        HistogramBox histogramB = new HistogramBox();
         Bitmap bitmap;
+        Bitmap bitmapClean;
 
         VideoCapture capture;
         double TotalFrame;
@@ -51,12 +56,8 @@ namespace PI
         {
             InitializeComponent();
             HandlerControlers(Visibility.Hidden);
-            //ShowHistograma();
-            WindowsFormsHost host = new WindowsFormsHost();
-            System.Windows.Forms.Button btn = new System.Windows.Forms.Button();
-            btn.Text = "mytnsi";
-            host.Child = btn;
-            grid1.Children.Add(host);
+ 
+           
         }
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -86,6 +87,7 @@ namespace PI
         {
             Manual window = new Manual();
             window.ShowDialog();
+            
         }
         private void BtnCamara_Click(object sender, RoutedEventArgs e)
         {
@@ -109,6 +111,7 @@ namespace PI
                 {
                     try
                     {
+                        bitmap = null;
                         isVideo = true;
                         saveVideo = true;
                         capture = new VideoCapture(selectedFileName);
@@ -136,8 +139,10 @@ namespace PI
                     isVideo = false;
                     saveVideo = false;
                     bitmap = new Bitmap(selectedFileName);
+                    bitmapClean = (Bitmap)bitmap.Clone();
                     HandlerControlers(Visibility.Hidden);
-                    ImageEdit.Source = new BitmapImage(new Uri(selectedFileName));
+                    ImageEdit.Source =Helpers.Convert(bitmap);
+                    ShowHistograma();
                 }
                 
             } 
@@ -173,53 +178,60 @@ namespace PI
 
         private async void SaveClick(object sender,RoutedEventArgs e)
         {
-            try
+          if(bitmap != null || saveVideo)
             {
-                await Task.Run(() =>
+                try
                 {
-
-                    Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-                    dlg.Filter = "Files (*.jpg;*.PNG;*.mp4)|*.jpg;*.PNG;*.mp4|All Files (*.*)|*.*";
-
-                    dlg.RestoreDirectory = false;
-                    bool? success = dlg.ShowDialog();
-                    if (success == true)
+                    await Task.Run(() =>
                     {
-                        if (!saveVideo)
-                            bitmap.Save(dlg.FileName, ImageFormat.Png);
-                        else
+
+                        Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+                        dlg.Filter = "Files (*.jpg;*.PNG;*.mp4)|*.jpg;*.PNG;*.mp4|All Files (*.*)|*.*";
+
+                        dlg.RestoreDirectory = false;
+                        bool? success = dlg.ShowDialog();
+                        if (success == true)
                         {
-
-                            VideoWriter VideoW = new VideoWriter(dlg.FileName,
-                                           VideoWriter.Fourcc('M', 'P', '4', 'V'),
-                                            Convert.ToInt32(Fps),
-                                          new System.Drawing.Size(vp.Width, vp.Height),
-                                           true);
-                            Mat m = new Mat();
-                            var si = 0;
-                            int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
-                            while (si < TotalFrame)
+                            if (!saveVideo)
+                                bitmap.Save(dlg.FileName, ImageFormat.Png);
+                            else
                             {
-                                si += 1;
 
-                                capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, si);
-                                capture.Read(m);
-                                if (m.GetData() != null)
+                                VideoWriter VideoW = new VideoWriter(dlg.FileName,
+                                               VideoWriter.Fourcc('M', 'P', '4', 'V'),
+                                                Convert.ToInt32(Fps),
+                                              new System.Drawing.Size(vp.Width, vp.Height),
+                                               true);
+                                Mat m = new Mat();
+                                var si = 0;
+                                int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
+                                while (si < TotalFrame)
                                 {
-                                    VideoW.Write(m);
+                                    si += 1;
+
+                                    capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, si);
+                                    capture.Read(m);
+                                    if (m.GetData() != null)
+                                    {
+                                        VideoW.Write(m);
+                                    }
+
                                 }
 
                             }
 
                         }
 
-                    }
-
-                });
+                    });
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show("Error al guardar imagen " + ex.ToString());
+                }
             }
-            catch (Exception ex)
+            else
             {
-                System.Windows.MessageBox.Show("Error al guardar imagen " + ex.ToString());
+                System.Windows.MessageBox.Show("No hay recurso ");
             }
         }
 
@@ -263,77 +275,111 @@ namespace PI
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ComboBoxItem typeItem = (ComboBoxItem)AddFilters.SelectedItem;
-            var value = typeItem.Content;
-            Filtros filtros = new Filtros();
-            switch (value)
+            if (bitmap != null || saveVideo )
             {
-                case "Sepia":
-                    
-                    Bitmap bmpSepia =  filtros.Sepia(bitmap);
-                    bitmap = bmpSepia;
-                    ImageEdit.Source = Helpers.Convert(bmpSepia);
-                   
-                    break;
+                ComboBoxItem typeItem = (ComboBoxItem)AddFilters.SelectedItem;
+                var value = typeItem.Content;
+                Filtros filtros = new Filtros();
+                
+                switch (value)
+                {
+                    case "Sepia":
 
-                case "Glitch":
-                    filtros.Glitch();
-                    break;
+                        Bitmap bmpSepia = filtros.Sepia(bitmap);
+                        bitmap = bmpSepia;
+                        ImageEdit.Source = Helpers.Convert(bmpSepia);
+                        ShowHistograma();
+                        AddItemList("Sepia");
+                        break;
 
-                case "Escala de grises":
-                    Bitmap bmpEdG = filtros.EscalaDeGrises(bitmap);
-                    bitmap = bmpEdG;
-                    ImageEdit.Source = Helpers.Convert(bmpEdG);
-                    break;
+                    case "Glitch":
+                        filtros.Glitch();
+                        break;
 
-                case "Sobel":
-                    filtros.Sobel();
-                    break;
+                    case "Escala de grises":
+                        Bitmap bmpEdG = filtros.EscalaDeGrises(bitmap);
+                        bitmap = bmpEdG;
+                        ImageEdit.Source = Helpers.Convert(bmpEdG);
+                        ShowHistograma();
+                        AddItemList("Escala de grises");
+                        break;
 
-                case "Laplaciano":
-                    filtros.Laplaciano();
-                    break;
+                    case "Sobel":
+                        filtros.Sobel();
+                        AddItemList("Sobel");
+                        break;
+
+                    case "Laplaciano":
+                        filtros.Laplaciano();
+                        AddItemList("Laplaciano");
+                        break;
+                }
             }
+
+            AddFilters.SelectedIndex = 0;
         }
 
 
         private void ShowHistograma()
         {
-            float[] BlueHist;
-            float[] GreenHist;
-            float[] RedHist;
+            Mat imga = bitmap.ToMat();
+            Image<Bgr, Byte> imgHist = imga.ToImage<Bgr, Byte>(); // imga.ToImage<Bgr, Byte>().ToBitmap();
 
-            Image<Bgr, Byte> imgHist = new Image<Bgr, byte>("C:/Users/angel/Desktop/conejitobonito.jpg");
-
-            DenseHistogram Histo = new DenseHistogram(255, new RangeF(0, 255));
-
-            Image<Gray, Byte> img2Blue = imgHist[0];
-            Image<Gray, Byte> img2Green = imgHist[1];
-            Image<Gray, Byte> img2Red = imgHist[2];
-        
-            // Create the MaskedTextBox control.
+            Image<Gray, Byte> imgBlue = imgHist[0];
+            Image<Gray, Byte> imgGreen = imgHist[1];
+            Image<Gray, Byte> imgRed = imgHist[2];
 
 
-            // Assign the MaskedTextBox control as the host control's child.
+            DenseHistogram histR = new DenseHistogram(256,new RangeF(0,255));
+            histR.Calculate(new Image<Gray, byte>[] { imgRed }, false, null);
+            Mat mR = new Mat();
+            histR.CopyTo(mR);
+            histogramR.ClearHistogram();
+            Mat mHistR = histogramR.GenerateHistogram("RED",System.Drawing.Color.Red,mR,256,new float[] { 0,256});
+            imageHistR.Source =Helpers.Convert(mHistR.ToImage<Bgr, Byte>().ToBitmap());
 
-            // Add the interop host control to the Grid
-            // control's collection of child controls.
+            DenseHistogram histG = new DenseHistogram(256, new RangeF(0, 255));
+            histG.Calculate(new Image<Gray, byte>[] { imgGreen }, false, null);
+            Mat mG = new Mat();
+            histG.CopyTo(mG);
+            histogramG.ClearHistogram();
+            Mat mHistG = histogramR.GenerateHistogram("GREEN", System.Drawing.Color.Green, mG, 256, new float[] { 0, 256 });
+            imageHistG.Source = Helpers.Convert(mHistG.ToImage<Bgr, Byte>().ToBitmap());
 
-            //  HistogramBox1.ClearHistogram();
-            //  HistogramBox1.GenerateHistograms(img2Red, 256);
-            //  HistogramBox1.Refresh();
+            DenseHistogram histB = new DenseHistogram(256, new RangeF(0, 255));
+            histB.Calculate(new Image<Gray, byte>[] { imgBlue }, false, null);
+            Mat mB = new Mat();
+            histB.CopyTo(mB);
+            histogramB.ClearHistogram();
+            Mat mHistB = histogramR.GenerateHistogram("BLUE", System.Drawing.Color.Blue, mB, 256, new float[] { 0, 256 });
+            imageHistB.Source = Helpers.Convert(mHistB.ToImage<Bgr, Byte>().ToBitmap());
 
-            // Histo.Calculate(new Image<Gray, Byte>[] { img2Blue}, true, null);
-            //The data is here
-            //Histo.MatND.ManagedArray
-            //BlueHist = new float[256];
-            // Histo.Calculate<Byte>(new Image<Gray, byte>[] { img2Blue }, true, null); 
-            // Histo.MatND.ManagedArray.CopyTo(BlueHist, 0);
-
-            // Histo.Clear();
 
         }
 
+        private async void Clean_Click(object sender, RoutedEventArgs e)
+        {
+
+            bitmap = (Bitmap)bitmapClean.Clone();
+            ImageEdit.Source = Helpers.Convert(bitmap);
+            ShowHistograma();
+            listFilters.Items.Clear();
+
+        }
+
+        private void AddItemList(String filter)
+        {
+            System.Windows.Controls.ListViewItem item = new System.Windows.Controls.ListViewItem { Background=(System.Windows.Media.Brush)Resources["Primary"]};
+            StackPanel stp = new StackPanel { Orientation = System.Windows.Controls.Orientation.Horizontal };
+            System.Windows.Controls.Image img = new System.Windows.Controls.Image { Source = Helpers.Convert(bitmap), Width = 40, Height = 40 };
+            TextBlock txt = new TextBlock { Text = filter, Foreground=(System.Windows.Media.Brush)Resources["Font2"], Margin=new Thickness { Top = 0, Bottom = 0, Right = 5, Left = 5 }, VerticalAlignment =VerticalAlignment.Center };
+            stp.Children.Add(img);
+            stp.Children.Add(txt);
+            item.Content = stp;
+            listFilters.Items.Add(item);
+        }
+
+     
 
     }
 }
