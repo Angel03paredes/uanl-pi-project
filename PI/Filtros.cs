@@ -9,7 +9,7 @@ namespace PI
 {
     class Filtros
     {
-        public Bitmap Sepia(Bitmap bitmap)
+        public static Bitmap Sepia(Bitmap bitmap)
         {
             int width = bitmap.Width;
             int height = bitmap.Height;
@@ -66,11 +66,11 @@ namespace PI
             }
             return bitmap;
         }
-        public void Glitch()
+        public static void Glitch()
         {
             //TODO glitch Filter
         }
-        public Bitmap EscalaDeGrises(Bitmap bitmap)
+        public static Bitmap EscalaDeGrises(Bitmap bitmap)
         {
             int width = bitmap.Width;
             int height = bitmap.Height;
@@ -90,11 +90,11 @@ namespace PI
             }
             return bitmap;
         }
-        public void Sobel()
+        public static void Sobel()
         {
             //TODO Sobel filter
         }
-        public void Laplaciano()
+        public static void Laplaciano()
         {
             //TODO Laplaciano Filter
         }

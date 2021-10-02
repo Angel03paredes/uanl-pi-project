@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PI"
         mc:Ignorable="d"
         Title="Camara" Height="600" Width="900"
-        WindowStyle="None" Background="#232322" BorderThickness="3" BorderBrush="#2D2D2C" AllowsTransparency="True" ResizeMode="CanResizeWithGrip">
+        WindowStyle="None" Background="#232322" BorderThickness="3" BorderBrush="#2D2D2C" AllowsTransparency="False" ResizeMode="NoResize">
     <Window.Resources>
         <SolidColorBrush x:Key="Primary" Color="#232322"/>
         <SolidColorBrush x:Key="Secondary" Color="#2D2D2C"/>
@@ -227,7 +227,7 @@
         </Style>
         <Style x:Key="BtnWindow" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="{StaticResource Secondary}" />
+            <Setter Property="Foreground" Value="{StaticResource SolidBorderBrush}" />
             <Setter Property="FontSize" Value="20" />
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -310,16 +310,14 @@
 
 
         <!-- Image -->
-        <Grid Grid.Row="2"  Background="{StaticResource Primary}">
-            <Image Name="ImageCam" Height="500"  Width="500"/>
-
+        <Grid Grid.Row="2" Background="{StaticResource Primary}">
+            <WindowsFormsHost Name="host"></WindowsFormsHost>
 
         </Grid>
         <!-- Histograma -->
         <Border Grid.Row="1"   Background="{StaticResource Secondary}">
             <StackPanel Orientation="Horizontal" >
-                <ComboBox Margin="10,0,0,0" Width="150" Height="50" Name="CmbFilter">  </ComboBox>
-                <Button Style="{StaticResource BtnNav}" Content="Abir" Width="100" Height="50" Name="InitCam" Click="InitCam_Click" ></Button>
+                <Button Style="{StaticResource BtnNav}" Content="Abir Camara" Margin="20,0,20,0" Height="50" Name="InitCam" Click="InitCam_Click" ></Button>
             </StackPanel>
         </Border>
 

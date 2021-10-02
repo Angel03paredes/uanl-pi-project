@@ -13,8 +13,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using AForge.Video;
-using AForge.Video.DirectShow;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+
 
 namespace PI
 {
@@ -24,13 +27,16 @@ namespace PI
     public partial class Camara : Window
     {
 
-        FilterInfoCollection filterInfoCollection;
-        VideoCaptureDevice videoCaptureDevice;
-
+        Emgu.CV.VideoCapture capture;
+        System.Windows.Forms.PictureBox pb = new System.Windows.Forms.PictureBox();
+        static readonly CascadeClassifier cascade = new CascadeClassifier("./data/haarcascade_frontalface_default.xml");
+        private static readonly Random random = new Random();
+        // IBackgroundSubtractor backgroundSubstractor;
         public Camara()
         {
             InitializeComponent();
-           Camera();
+            host.Child = pb;
+
         }
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -58,51 +64,68 @@ namespace PI
 
         private void InitCam_Click(object sender, RoutedEventArgs e)
         {
-            videoCaptureDevice = new VideoCaptureDevice(filterInfoCollection[CmbFilter.SelectedIndex].MonikerString);
-            videoCaptureDevice.NewFrame += VideoCaptureDevice_NewFrame;
-            videoCaptureDevice.Start();
+            capture = null;
+            Camera();
         }
 
-        private void VideoCaptureDevice_NewFrame(object sender,NewFrameEventArgs eventArgs)
-        {
-            //Application.Current.Dispatcher.Invoke(new Action(() =>
-            //{
-            //    ImageCam.Source = eventArgs.Frame.Clone() as BitmapImage;
-            //}));
 
-            try
-            {
-                BitmapImage bi;
-                using (var bitmap = (Bitmap)eventArgs.Frame.Clone())
-                {
-                    bi = bitmap.ToBitmapImage();
-                }
-                bi.Freeze(); // avoid cross thread operations and prevents leaks
-                Dispatcher.BeginInvoke(new ThreadStart(delegate { ImageCam.Source = bi; }));
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show("Error on _videoSource_NewFrame:\n" + exc.Message, "Error");
-        
-              StopCamera();
-            }
-        }
+
 
         private void Camera()
         {
-            filterInfoCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            foreach (FilterInfo filterInfo in filterInfoCollection)
-                CmbFilter.Items.Add(filterInfo.Name);
-            CmbFilter.SelectedIndex = 0;
-            videoCaptureDevice = new VideoCaptureDevice();
-        }
-        private void StopCamera()
-        {
-            if (videoCaptureDevice != null && videoCaptureDevice.IsRunning)
+            if (capture == null)
             {
-                videoCaptureDevice.SignalToStop();
-                videoCaptureDevice.NewFrame -= new NewFrameEventHandler(VideoCaptureDevice_NewFrame);
+                capture = new VideoCapture(0);
+            } 
+           // backgroundSubstractor = new Emgu.CV.BgSegm.BackgroundSubtractorMOG();//BackgroundSubtractorKNN(200, 20, false);
+            capture.ImageGrabbed += Capture_ImageGrabbed;
+            capture.Start();
+
+
+        }
+
+        private void Capture_ImageGrabbed(object sender, EventArgs e)
+        {
+            if (capture != null)
+            {
+                try
+                {
+                    Mat m = new Mat();
+                    capture.Retrieve(m);
+                    Bitmap bit = m.ToBitmap();
+                    Image<Gray, byte> grayImage = bit.ToImage<Gray, byte>();
+                    System.Drawing.Rectangle[] rectangles = cascade.DetectMultiScale(grayImage,1.4,0);
+
+                    
+                    foreach(System.Drawing.Rectangle rectangulo in rectangles)
+                    {
+                        using(Graphics graphics = Graphics.FromImage(bit))
+                        {
+                            using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255)), 1))
+                            {
+                                graphics.DrawRectangle(pen, rectangulo);
+                                
+                            }
+                        }
+                    }
+                    pb.Image = bit;
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al grabar frames " + ex.ToString());
+                }
             }
         }
+
+        private void StopCamera()
+        {
+            if (capture != null)
+            {
+                capture.Stop();
+            }
+        }
+
+       
     }
 }

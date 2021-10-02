@@ -1,5 +1,4 @@
-﻿using AForge.Video;
-using AForge.Video.DirectShow;
+﻿
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -151,27 +150,28 @@ namespace PI
         private async void ReadAllFrames()
         {
 
-            Mat m = new Mat();
-            int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
-            while (isVideo == true && FrameNo < TotalFrame)
-            {
-                FrameNo += mult; //Convert.ToInt16(numericUpDown1.Value);
-               
-                capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, FrameNo);
-                
-                capture.Read(m);
-                if(m.GetData() != null)
+                Mat m = new Mat();
+                int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
+                while (isVideo == true && FrameNo < TotalFrame)
                 {
-                    Bitmap bmpi = m.ToImage<Bgr, Byte>().ToBitmap();
-                    ImageEdit.Source = Helpers.Convert(bmpi);
-                    await Task.Delay(1000 / Convert.ToInt16(Fps));
+                    FrameNo += mult; //Convert.ToInt16(numericUpDown1.Value);
+                    capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, FrameNo);
+                    capture.Read(m);
+
+                    if (m.GetData() != null)
+                    {
+                        Bitmap bmpi = m.ToImage<Bgr, Byte>().ToBitmap();
+                       // Bitmap filBmp = Filtros.Sepia(bmpi);
+                        ImageEdit.Source = Helpers.Convert(bmpi);
+                        await Task.Delay(1000 / Convert.ToInt16(Fps));
+                    }
+                    else
+                    {
+                        isVideo = false;
+
+                    }
                 }
-                else
-                {
-                    isVideo = false;
-                    
-                }
-            }
+           
         }
 
         
@@ -275,17 +275,18 @@ namespace PI
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (bitmap != null || saveVideo )
+
+            ComboBoxItem typeItem = (ComboBoxItem)AddFilters.SelectedItem;
+            var value = typeItem.Content;
+            if (bitmap != null )
             {
-                ComboBoxItem typeItem = (ComboBoxItem)AddFilters.SelectedItem;
-                var value = typeItem.Content;
-                Filtros filtros = new Filtros();
+           
                 
                 switch (value)
                 {
                     case "Sepia":
 
-                        Bitmap bmpSepia = filtros.Sepia(bitmap);
+                        Bitmap bmpSepia = Filtros.Sepia(bitmap);
                         bitmap = bmpSepia;
                         ImageEdit.Source = Helpers.Convert(bmpSepia);
                         ShowHistograma();
@@ -293,11 +294,11 @@ namespace PI
                         break;
 
                     case "Glitch":
-                        filtros.Glitch();
+                        Filtros.Glitch();
                         break;
 
                     case "Escala de grises":
-                        Bitmap bmpEdG = filtros.EscalaDeGrises(bitmap);
+                        Bitmap bmpEdG = Filtros.EscalaDeGrises(bitmap);
                         bitmap = bmpEdG;
                         ImageEdit.Source = Helpers.Convert(bmpEdG);
                         ShowHistograma();
@@ -305,12 +306,12 @@ namespace PI
                         break;
 
                     case "Sobel":
-                        filtros.Sobel();
+                        Filtros.Sobel();
                         AddItemList("Sobel");
                         break;
 
                     case "Laplaciano":
-                        filtros.Laplaciano();
+                        Filtros.Laplaciano();
                         AddItemList("Laplaciano");
                         break;
                 }
@@ -357,7 +358,7 @@ namespace PI
 
         }
 
-        private async void Clean_Click(object sender, RoutedEventArgs e)
+        private  void Clean_Click(object sender, RoutedEventArgs e)
         {
 
             bitmap = (Bitmap)bitmapClean.Clone();
@@ -380,6 +381,8 @@ namespace PI
         }
 
      
+      
+        
 
     }
 }
