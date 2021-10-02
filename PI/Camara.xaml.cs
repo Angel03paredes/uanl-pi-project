@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -18,7 +19,6 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 
-
 namespace PI
 {
     /// <summary>
@@ -26,17 +26,19 @@ namespace PI
     /// </summary>
     public partial class Camara : Window
     {
-
+        BitmapImage play = new BitmapImage(new Uri("./image/play.png", UriKind.Relative));
+        BitmapImage pause = new BitmapImage(new Uri("./image/stop.png", UriKind.Relative));
         Emgu.CV.VideoCapture capture;
         System.Windows.Forms.PictureBox pb = new System.Windows.Forms.PictureBox();
         static readonly CascadeClassifier cascade = new CascadeClassifier("./data/haarcascade_frontalface_default.xml");
         private static readonly Random random = new Random();
+        Boolean captureFrame = false;
         // IBackgroundSubtractor backgroundSubstractor;
         public Camara()
         {
             InitializeComponent();
             host.Child = pb;
-
+            
         }
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -76,17 +78,20 @@ namespace PI
             if (capture == null)
             {
                 capture = new VideoCapture(0);
-            } 
-           // backgroundSubstractor = new Emgu.CV.BgSegm.BackgroundSubtractorMOG();//BackgroundSubtractorKNN(200, 20, false);
-            capture.ImageGrabbed += Capture_ImageGrabbed;
-            capture.Start();
+            }
+            // backgroundSubstractor = new Emgu.CV.BgSegm.BackgroundSubtractorMOG();//BackgroundSubtractorKNN(200, 20, false);
+           
+            
+                capture.ImageGrabbed += Capture_ImageGrabbed;
+                capture.Start();
+            ShowControls(Visibility.Visible);
 
 
         }
 
         private void Capture_ImageGrabbed(object sender, EventArgs e)
         {
-            if (capture != null)
+            if (capture != null &&  !captureFrame)
             {
                 try
                 {
@@ -94,20 +99,24 @@ namespace PI
                     capture.Retrieve(m);
                     Bitmap bit = m.ToBitmap();
                     Image<Gray, byte> grayImage = bit.ToImage<Gray, byte>();
-                    System.Drawing.Rectangle[] rectangles = cascade.DetectMultiScale(grayImage,1.4,0);
-
+                    System.Drawing.Rectangle[] rectangles = cascade.DetectMultiScale(grayImage,1.1,3);
+                    var si = 1;
                     
                     foreach(System.Drawing.Rectangle rectangulo in rectangles)
                     {
-                        using(Graphics graphics = Graphics.FromImage(bit))
+                        //System.Drawing.Color.FromArgb(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255))
+                        using (Graphics graphics = Graphics.FromImage(bit))
                         {
-                            using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255)), 1))
+                            using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.Red, 3))
                             {
+                                String persona = "Persona" + si.ToString();
                                 graphics.DrawRectangle(pen, rectangulo);
-                                
+                                graphics.DrawString(persona,new Font("Segoe UI",12), new System.Drawing.SolidBrush(System.Drawing.Color.Red), new PointF(rectangulo.X,rectangulo.Y));
                             }
                         }
-                    }
+                        si++;
+                   }
+                 
                     pb.Image = bit;
 
                 }
@@ -123,9 +132,43 @@ namespace PI
             if (capture != null)
             {
                 capture.Stop();
+                capture.Dispose();
             }
         }
 
-       
+        private void StopCam_Click(object sender, RoutedEventArgs e)
+        {
+            if (captureFrame)
+                BtnStopPlay.Source = pause;
+            else
+                BtnStopPlay.Source = play;
+            
+            captureFrame = !captureFrame;
+        }
+
+        private void SaveCam_Click(object sender, RoutedEventArgs e)
+        {
+
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.Filter = "Files (*.jpg;*.PNG)|*.jpg;*.PNG|All Files (*.*)|*.*";
+
+            dlg.RestoreDirectory = false;
+            bool? success = dlg.ShowDialog();
+            if (success == true)
+            {
+
+                Bitmap bit = new Bitmap(pb.Image);
+                bit.Save(dlg.FileName, ImageFormat.Png);
+
+
+            }
+
+        }
+
+        private void ShowControls(Visibility visibility)
+        {
+            SaveCam.Visibility = visibility;
+            StopCam.Visibility = visibility;
+        }
     }
 }

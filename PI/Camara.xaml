@@ -317,7 +317,12 @@
         <!-- Histograma -->
         <Border Grid.Row="1"   Background="{StaticResource Secondary}">
             <StackPanel Orientation="Horizontal" >
+              
                 <Button Style="{StaticResource BtnNav}" Content="Abir Camara" Margin="20,0,20,0" Height="50" Name="InitCam" Click="InitCam_Click" ></Button>
+                <Button Visibility="Hidden" Style="{StaticResource BtnNav}" Margin="20,0,20,0" Height="50" Name="StopCam" Click="StopCam_Click" >
+                    <Image Name="BtnStopPlay"  Source="./image/stop.png"/>
+                </Button>
+                <Button Visibility="Hidden" Style="{StaticResource BtnNav}" Content="Guardar" Margin="20,0,20,0" Height="50" Name="SaveCam" Click="SaveCam_Click" ></Button>
             </StackPanel>
         </Border>
 
