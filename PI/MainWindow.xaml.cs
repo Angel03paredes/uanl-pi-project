@@ -36,7 +36,7 @@ namespace PI
         //private IVideoSource _videoSource;
         BitmapImage play = new BitmapImage(new Uri("./image/play.png", UriKind.Relative));
         BitmapImage pause = new BitmapImage(new Uri("./image/stop.png", UriKind.Relative));
-      
+       // VideoWriter videoW;
         HistogramBox histogramR = new HistogramBox();
         HistogramBox histogramG = new HistogramBox();
         HistogramBox histogramB = new HistogramBox();
@@ -113,19 +113,17 @@ namespace PI
                         bitmap = null;
                         isVideo = true;
                         saveVideo = true;
-                        capture = new VideoCapture(selectedFileName);
+                        capture = new VideoCapture(selectedFileName);                                                                                                                                          
                         var vpSet = capture.QueryFrame();
                         vp = new System.Drawing.Size(vpSet.Width, vpSet.Height);
-                        // Mat m = new Mat();
-                        //capture.Read(m);
-
-                        //Bitmap bmpi = m.ToImage<Bgr, Byte>().ToBitmap();
-                        //ImageEdit.Source = Helpers.Convert(m.ToBitmap());
+                     
 
                         TotalFrame = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameCount);
                         Fps = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps);
+                       
                         HandlerControlers(Visibility.Visible);
                         ReadAllFrames();
+
                     }
                     catch (Exception ex)
                     {
@@ -147,31 +145,42 @@ namespace PI
             } 
         }
 
-        private async void ReadAllFrames()
+        private  async void ReadAllFrames()
         {
 
+            await Task.Run(async() =>
+            {
                 Mat m = new Mat();
-                int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
-                while (isVideo == true && FrameNo < TotalFrame)
+                  // int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
+                  while (isVideo == true && FrameNo < TotalFrame)
                 {
-                    FrameNo += mult; //Convert.ToInt16(numericUpDown1.Value);
-                    capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, FrameNo);
-                    capture.Read(m);
+                    FrameNo += 4; //Convert.ToInt16(numericUpDown1.Value);
 
+
+                      capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, FrameNo);
+                    capture.Read(m);
                     if (m.GetData() != null)
                     {
+
+                       
+                        
                         Bitmap bmpi = m.ToImage<Bgr, Byte>().ToBitmap();
-                       // Bitmap filBmp = Filtros.Sepia(bmpi);
-                        ImageEdit.Source = Helpers.Convert(bmpi);
-                        await Task.Delay(1000 / Convert.ToInt16(Fps));
-                    }
+                      // Bitmap filBmp =  Filtros.EscalaDeGrises(bmpi);
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            ImageEdit.Source = Helpers.Convert(bmpi);
+                        });
+
+                          // await Task.Delay(1000 / Convert.ToInt16(Fps));
+                      }
                     else
                     {
                         isVideo = false;
 
                     }
                 }
-           
+
+            });
         }
 
         
@@ -204,7 +213,6 @@ namespace PI
                                                true);
                                 Mat m = new Mat();
                                 var si = 0;
-                                int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
                                 while (si < TotalFrame)
                                 {
                                     si += 1;
@@ -294,7 +302,11 @@ namespace PI
                         break;
 
                     case "Glitch":
-                        Filtros.Glitch();
+                        Bitmap bmpGlitch = Filtros.Glitch(bitmap);
+                        bitmap = bmpGlitch;
+                        ImageEdit.Source = Helpers.Convert(bmpGlitch);
+                        ShowHistograma();
+                        AddItemList("Glitch");
                         break;
 
                     case "Escala de grises":
@@ -329,7 +341,7 @@ namespace PI
             Image<Gray, Byte> imgBlue = imgHist[0];
             Image<Gray, Byte> imgGreen = imgHist[1];
             Image<Gray, Byte> imgRed = imgHist[2];
-
+            
 
             DenseHistogram histR = new DenseHistogram(256,new RangeF(0,255));
             histR.Calculate(new Image<Gray, byte>[] { imgRed }, false, null);
@@ -381,7 +393,7 @@ namespace PI
         }
 
      
-      
+     
         
 
     }

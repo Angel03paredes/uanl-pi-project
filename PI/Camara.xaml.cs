@@ -31,7 +31,7 @@ namespace PI
         Emgu.CV.VideoCapture capture;
         System.Windows.Forms.PictureBox pb = new System.Windows.Forms.PictureBox();
         static readonly CascadeClassifier cascade = new CascadeClassifier("./data/haarcascade_frontalface_default.xml");
-        private static readonly Random random = new Random();
+        
         Boolean captureFrame = false;
         // IBackgroundSubtractor backgroundSubstractor;
         public Camara()
