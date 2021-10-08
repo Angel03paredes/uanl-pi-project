@@ -7,7 +7,7 @@
        
         xmlns:local="clr-namespace:PI"
         mc:Ignorable="d" AllowsTransparency="False" 
-        Title="MainWindow" Height="645" Width="1200" Background="#232322" BorderThickness="3" BorderBrush="#2D2D2C" ResizeMode="NoResize" WindowStyle="None">
+        Title="MainWindow" Height="645" Width="1200" Background="#232322" BorderThickness="3" BorderBrush="#2D2D2C" ResizeMode="NoResize" WindowStyle="None" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <SolidColorBrush x:Key="Primary" Color="#232322"/>
         <SolidColorBrush x:Key="Secondary" Color="#2D2D2C"/>
@@ -393,12 +393,7 @@
                 <ComboBoxItem>5</ComboBoxItem>
                 <ComboBoxItem>7</ComboBoxItem>
                 <ComboBoxItem>8</ComboBoxItem>
-                <ComboBoxItem>9</ComboBoxItem>
-                <ComboBoxItem>10</ComboBoxItem>
-                <ComboBoxItem>11</ComboBoxItem>
-                <ComboBoxItem>12</ComboBoxItem>
-                <ComboBoxItem>13</ComboBoxItem>
-                <ComboBoxItem>14</ComboBoxItem>
+             
                 
             </ComboBox>
 

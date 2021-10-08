@@ -101,32 +101,34 @@ namespace PI
         private async void Importar_Click(object sender, RoutedEventArgs e)
         {
 
-            await Task.Run(() => {
-                Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-                dlg.InitialDirectory = "c:\\";
-                dlg.Filter = "Files |*.jpg;*.png;*.mp4|JPG (*.jpg)|*.jpg|PNG(*.png)|*.png|MP4(*.mp4)|*.mp4|All Files (*.*)|*.*";
-                dlg.RestoreDirectory = true;
-                bool? success = dlg.ShowDialog();
+            try
+            {
+                await Task.Run(() => {
+                    Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+                    dlg.InitialDirectory = "c:\\";
+                    dlg.Filter = "Files |*.jpg;*.png;*.mp4|JPG (*.jpg)|*.jpg|PNG(*.png)|*.png|MP4(*.mp4)|*.mp4|All Files (*.*)|*.*";
+                    dlg.RestoreDirectory = true;
+                    bool? success = dlg.ShowDialog();
 
-                if (success == true)
-                {
-
-
-                    Dispatcher.Invoke(() =>
+                    if (success == true)
                     {
-                        listFilters.Items.Clear();
-                    });
 
-                    string selectedFileName = dlg.FileName;
-                    string ext = System.IO.Path.GetExtension(dlg.FileName);
-                    if (ext == ".mp4" || ext == ".mpeg")
-                    {
-                        
-                              if (capture != null)
-                              {
-                                  isVideoPause = false;
-                                Stop_Click(sender, e);
-                             }
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            listFilters.Items.Clear();
+                        });
+
+                        string selectedFileName = dlg.FileName;
+                        string ext = System.IO.Path.GetExtension(dlg.FileName);
+                        if (ext == ".mp4" || ext == ".mpeg")
+                        {
+
+                            if (capture != null && !isVideoPause)
+                            {
+                                System.Windows.MessageBox.Show("Pausa el video antes de importar","Aviso",MessageBoxButton.OK,MessageBoxImage.Warning);
+                                goto Finish;
+                            }
                             VideoCapture captureTemp = new VideoCapture(selectedFileName);
                             var vpSet = captureTemp.QuerySmallFrame();
                             vp = new System.Drawing.Size(vpSet.Width, vpSet.Height);
@@ -136,13 +138,13 @@ namespace PI
                             if ((vpSet.Width * 2) < 650)
                             {
                                 listBitamp.Clear();
-                               
+                                listBitamp = new List<Bitmap>();
                                 Dispatcher.Invoke(() => {
                                     BtnReplay.Visibility = Visibility.Hidden;
                                     listFilters.Items.Clear();
                                     BtnStopPlay.Source = pause;
                                 });
-                                
+
                                 isVideoPause = false;
                                 FrameNo = 0;
                                 bitmap = null;
@@ -157,28 +159,34 @@ namespace PI
                             }
                             else
                             {
-                                System.Windows.MessageBox.Show("El video debe ser una resolución menor, menor a 640 x 480");
+                                System.Windows.MessageBox.Show("El video debe ser una resolución menor, menor a 640 x 480","aviso",MessageBoxButton.OK,MessageBoxImage.Warning);
                             }
 
-                       
 
-                    }
-                    else
-                    {
-                        isVideo = false;
-                        saveVideo = false;
-                        bitmap = new Bitmap(selectedFileName);
-                        bitmapClean = (Bitmap)bitmap.Clone();
-                       
+
+                        }
+                        else
+                        {
+                            isVideo = false;
+                            saveVideo = false;
+                            bitmap = new Bitmap(selectedFileName);
+                            bitmapClean = (Bitmap)bitmap.Clone();
+
                             HandlerControlers(Visibility.Hidden);
-                        Dispatcher.Invoke(() => { ImageEdit.Source = Helpers.Convert(bitmap); });
+                            Dispatcher.Invoke(() => { ImageEdit.Source = Helpers.Convert(bitmap); });
                             ShowHistograma();
-                        
+                       
+                        }
+                    Finish:
+                        System.Diagnostics.Debug.WriteLine("Salta el proceso de importar video");
                     }
 
-                }
-
-            });
+                });
+            }
+            catch(Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+            }
         }
 
         
@@ -265,10 +273,12 @@ namespace PI
                                     newBitmap = Filtros.Laplaciano(bmpi);
                                     break;
                                 default:
-                                    newBitmap = (Bitmap)bmpi.Clone();
+                                   newBitmap = (Bitmap)bmpi.Clone();
                                     break;
                             }
-                            listBitamp.Add(newBitmap);
+                            
+                                listBitamp.Add(newBitmap);
+                            
                             ShowHistograma((Bitmap)newBitmap.Clone());
                             this.Dispatcher.Invoke(() =>
                             {
@@ -276,7 +286,7 @@ namespace PI
                                     ImageEdit.Source = Helpers.Convert(newBitmap);
                             });
 
-                           await Task.Delay(1000 / Convert.ToInt16(Fps ));
+                         //  await Task.Delay(1000 / Convert.ToInt16(Fps ));
                         }
                         else
                         {
@@ -315,7 +325,7 @@ namespace PI
           
         }
 
-       private void Proccessvideo()
+       private  void Proccessvideo()
         {
             if (bitmap != null || saveVideo)
             {
@@ -348,24 +358,40 @@ namespace PI
                             VideoCapture writeCapture = capture;
 
                             VideoWriter VideoW = new VideoWriter(dlg.FileName,
-                                           VideoWriter.Fourcc('M', 'P', '4', 'V'),
+                                           VideoWriter.Fourcc('P', 'I', 'M', '3'),
                                             Convert.ToInt32(Fps),
                                           new System.Drawing.Size(vp.Width, vp.Height),
                                            true);
                             Mat m = new Mat();
-                            var frameNoVideoW = 0;
-                            while (frameNoVideoW < TotalFrame)
+                            foreach(var bmp in listBitamp)
                             {
-                                frameNoVideoW += 1;
-
-                                writeCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, frameNoVideoW);
-                                m = writeCapture.QuerySmallFrame();
+                              
+                                //writeCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, frameNoVideoW);
+                                m = bmp.ToMat();  //writeCapture.QuerySmallFrame();
                                 if (m != null)
                                 {
-                                    VideoW.Write(m);
+                                  
+                                        VideoW.Write(m);
+                                  
                                 }
                              
 
+                            }
+                            
+                            if (listBitamp.Count < TotalFrame )
+                            {
+                                var tempIterator = listBitamp.Count;
+                                while(tempIterator < TotalFrame)
+                                {
+
+                                    writeCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, tempIterator);
+                                    m = writeCapture.QuerySmallFrame();
+                                    if (m != null)
+                                    {
+                                        VideoW.Write(m);
+                                    }
+                                    tempIterator++;
+                                }    
                             }
 
                         }
@@ -415,6 +441,7 @@ namespace PI
                 isVideoPause = false;
                 isVideo = true;
                 FrameNo = 0;
+            listBitamp = new List<Bitmap>();
             BtnReplay.Visibility = Visibility.Hidden;
             ReadAllFrames();
           
@@ -600,6 +627,7 @@ namespace PI
             }
             else
             {
+                listBitamp = new List<Bitmap>();
                 FiltroVideo = EnumFiltros.None;
                 listFilters.Items.Clear();
             }

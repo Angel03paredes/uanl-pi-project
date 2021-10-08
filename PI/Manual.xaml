@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PI"
         mc:Ignorable="d"
         Title="Manual" Height="450" Width="800"
-        WindowStyle="None" Background="#232322" BorderThickness="3" BorderBrush="#2D2D2C" AllowsTransparency="True" ResizeMode="CanResizeWithGrip">
+        WindowStyle="None" Background="#232322" BorderThickness="3" BorderBrush="#2D2D2C" AllowsTransparency="True" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <SolidColorBrush x:Key="Primary" Color="#232322"/>
         <SolidColorBrush x:Key="Secondary" Color="#2D2D2C"/>
