@@ -106,7 +106,7 @@ namespace PI
                         p2 = bitmap.GetPixel(x + factWidth   / 2, y);
                     }
 
-                    if ( y > factHeight * 7 && y < (factHeight * 7) + 50)
+                    if ( y > factHeight * 7 && y < (factHeight * 7) + factHeight)
                     {
                         p = bitmap.GetPixel(x, y + factHeight *2);
                         p2 = bitmap.GetPixel(x, y +factHeight * 2);
@@ -140,13 +140,32 @@ namespace PI
             }
             return bitmap;
         }
-        public static void Sobel()
+        public  static Bitmap Sobel(Bitmap bitmap)
         {
-            //TODO Sobel filter
+            int[,] sobelMat = new int[,]
+            {
+                { 1,2,1},
+                { 0,0,0 },
+                { -1,-2,-1}
+            };
+
+            Bitmap gray = EscalaDeGrises(bitmap);
+            Bitmap sobel = Helpers.BorderBitmap(sobelMat, gray, 0, 255);
+            return sobel;
+
         }
-        public static void Laplaciano()
+        public static Bitmap Laplaciano(Bitmap bitmap)
         {
-            //TODO Laplaciano Filter
+            int[,] sobelMat = new int[,]
+           {
+                { 1,1,1},
+                { 1,-8,1},
+                { 1,1,1}
+           };
+
+            Bitmap gray = EscalaDeGrises(bitmap);
+            Bitmap sobel = Helpers.BorderBitmap(sobelMat, gray, 32, 64);
+            return sobel;
         }
     }
 }

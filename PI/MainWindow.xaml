@@ -17,6 +17,7 @@
 
         <SolidColorBrush x:Key="Green" Color="Green" />
         <SolidColorBrush x:Key="Blue" Color="Blue" />
+        <SolidColorBrush x:Key="Red" Color="#F2624B" />
 
         <SolidColorBrush x:Key="Yellow" Color="Yellow" />
 
@@ -84,7 +85,7 @@
             <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
             <Setter Property="FontSize" Value="20" />
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="MinWidth" Value="60"/>
             <Setter Property="MinHeight" Value="20"/>
             <Setter Property="Foreground" Value="{StaticResource Font2}"/>
             <Setter Property="Template">
@@ -258,6 +259,39 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="BtnWindowClose" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource SolidBorderBrush}" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate  TargetType="{x:Type Button}">
+                        <Border CornerRadius="15" Background="{TemplateBinding Background}">
+                            <Grid>
+
+                                <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" />
+                            </Grid>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource Red }" />
+                                <Setter Property="Foreground" Value="#FFF" />
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource Secondary}" />
+                                <Setter Property="Foreground" Value="#FFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="BtnNav" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource Secondary}" />
             <Setter Property="Foreground" Value="{StaticResource Font2}" />
@@ -311,7 +345,7 @@
 
                 <Button Click="ButtonMin_Click" Content="―"  Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" ></Button>
                 <Button Content="▢" Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" Click="ButtonMax_Click"  ></Button>
-                <Button Content="🗙"  Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" Click="ButtonClose_Click"  ></Button>
+                <Button Content="🗙"  Width="40" Height="Auto"   Style="{StaticResource BtnWindowClose}" Click="ButtonClose_Click"  ></Button>
             </StackPanel>
         </Border>
 
@@ -336,7 +370,7 @@
         <Border Background="{StaticResource Secondary}" Grid.Row="1" Grid.Column="1" >
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button  Style="{StaticResource BtnNav}" Click="BtnManual_Click" Content="Manual" Width="120">
-                    
+
                 </Button>
             </StackPanel>
         </Border>
@@ -344,12 +378,29 @@
         <Grid Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" Background="{StaticResource Primary}">
 
             <Image   Name="ImageEdit"  Height="296" Width="444"  />
-            <Button Name="BtnPlay" Click="Stop_Click"  Style="{StaticResource BtnWindow}" Width="30" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-40,0,0,20" >
+            <Button  Visibility="Hidden" Name="BtnPlay" Click="Stop_Click"  Style="{StaticResource BtnWindow}" Width="30" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,20" >
                 <Image Name="BtnStopPlay"  Source="./image/stop.png"/>
             </Button>
-            <Button Name="BtnReplay" Click="Reload_Click" Style="{StaticResource BtnWindow}"  Width="30" Height="30" HorizontalAlignment="Center" Margin="40,0,0,20" VerticalAlignment="Bottom">
+            <Button Name="BtnReplay" Visibility="Hidden" Click="Reload_Click" Style="{StaticResource BtnWindow}"  Width="30" Height="30" HorizontalAlignment="Center" Margin="80,0,0,20" VerticalAlignment="Bottom">
                 <Image  Source="./image/reload.png"/>
             </Button>
+            <TextBlock Name="txtSpeed"  Visibility="Hidden" HorizontalAlignment="Center" Foreground="{StaticResource Font3}" Margin="-280,0,0,25" FontSize="18" VerticalAlignment="Bottom">Velocidad:</TextBlock>
+            <ComboBox SelectedValue="1" HorizontalAlignment="Center" Name="cmbSpeed" Margin="-120,0,0,20" Visibility="Hidden" VerticalAlignment="Bottom" >
+                <ComboBoxItem>1</ComboBoxItem>
+                <ComboBoxItem>2</ComboBoxItem>
+                <ComboBoxItem>3</ComboBoxItem>
+                <ComboBoxItem>4</ComboBoxItem>
+                <ComboBoxItem>5</ComboBoxItem>
+                <ComboBoxItem>7</ComboBoxItem>
+                <ComboBoxItem>8</ComboBoxItem>
+                <ComboBoxItem>9</ComboBoxItem>
+                <ComboBoxItem>10</ComboBoxItem>
+                <ComboBoxItem>11</ComboBoxItem>
+                <ComboBoxItem>12</ComboBoxItem>
+                <ComboBoxItem>13</ComboBoxItem>
+                <ComboBoxItem>14</ComboBoxItem>
+                
+            </ComboBox>
 
 
         </Grid>
@@ -362,7 +413,7 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-               
+
                 <StackPanel Grid.Row="0">
                     <TextBlock  HorizontalAlignment="Center" Text="Histograma" Foreground="{StaticResource Font3}"  />
                 </StackPanel>
@@ -370,11 +421,11 @@
                 <Image Grid.Row="2" Name="imageHistG"></Image>
                 <Image Grid.Row="3" Name="imageHistB"></Image>
             </Grid>
-            
+
         </Border>
         <!-- Filtros -->
         <Border Grid.Row="3" Grid.Column="1"  Margin="10" CornerRadius="10" Background="{StaticResource Secondary}">
-            
+
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20"/>
@@ -386,11 +437,11 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                
-                    <TextBlock Grid.Row="0" Grid.Column="1"  Text="Filtros" FontSize="14" Foreground="{StaticResource Font3}" />
-                    <Button Click="Clean_Click"   Grid.Row="0" Grid.Column="2" Style="{StaticResource BtnNav}"   Content="Limpiar" FontSize="14"  />
-                
-                    <ListView Name="listFilters" Grid.Row="1" Grid.ColumnSpan="3" Background="{StaticResource Secondary}" Margin="5" Padding="5 ,5,5,5" BorderBrush="Transparent"/>
+
+                <TextBlock Grid.Row="0" Grid.Column="1"  Text="Filtros" FontSize="14" Foreground="{StaticResource Font3}" />
+                <Button Click="Clean_Click"   Grid.Row="0" Grid.Column="2" Style="{StaticResource BtnNav}"   Content="Limpiar" FontSize="14"  />
+
+                <ListView Name="listFilters" Grid.Row="1" Grid.ColumnSpan="3" Background="{StaticResource Secondary}" Margin="5" Padding="5 ,5,5,5" BorderBrush="Transparent"/>
             </Grid>
 
         </Border>

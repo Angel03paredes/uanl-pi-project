@@ -49,6 +49,7 @@ namespace PI
         private void ButtonMin_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
+            
         }
 
         private void ButtonMax_Click(object sender, RoutedEventArgs e)
@@ -100,10 +101,11 @@ namespace PI
                     Bitmap bit = m.ToBitmap();
                     Image<Gray, byte> grayImage = bit.ToImage<Gray, byte>();
                     System.Drawing.Rectangle[] rectangles = cascade.DetectMultiScale(grayImage,1.1,3);
-                    var si = 1;
+                    var si = 0;
                     
                     foreach(System.Drawing.Rectangle rectangulo in rectangles)
                     {
+                        si++;
                         //System.Drawing.Color.FromArgb(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255))
                         using (Graphics graphics = Graphics.FromImage(bit))
                         {
@@ -114,9 +116,17 @@ namespace PI
                                 graphics.DrawString(persona,new Font("Segoe UI",12), new System.Drawing.SolidBrush(System.Drawing.Color.Red), new PointF(rectangulo.X,rectangulo.Y));
                             }
                         }
-                        si++;
+                        
                    }
-                 
+                    // Para mostrar cuantas personas se estan leyendo
+                    using (Graphics graphics = Graphics.FromImage(bit))
+                    {
+                            String persona = "Conteo de personas:  " + si.ToString();
+                            
+                            graphics.DrawString(persona, new Font("Segoe UI", 22), new System.Drawing.SolidBrush(System.Drawing.Color.Blue), new PointF(0,0));
+                       
+                    }
+
                     pb.Image = bit;
 
                 }
@@ -169,6 +179,8 @@ namespace PI
         {
             SaveCam.Visibility = visibility;
             StopCam.Visibility = visibility;
+            
+            
         }
     }
 }

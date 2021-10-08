@@ -11,9 +11,10 @@
         <SolidColorBrush x:Key="Primary" Color="#232322"/>
         <SolidColorBrush x:Key="Secondary" Color="#2D2D2C"/>
         <SolidColorBrush x:Key="btnColor" Color="#1C82FE"/>
-
+        
         <SolidColorBrush x:Key="SolidBorderBrush" Color="#888" />
 
+        <SolidColorBrush x:Key="Red" Color="#F2624B" />
         <SolidColorBrush x:Key="Green" Color="Green" />
         <SolidColorBrush x:Key="Blue" Color="Blue" />
 
@@ -225,6 +226,40 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <Style x:Key="BtnWindowClose" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource SolidBorderBrush}" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate  TargetType="{x:Type Button}">
+                        <Border CornerRadius="15" Background="{TemplateBinding Background}">
+                            <Grid>
+
+                                <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" />
+                            </Grid>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource Red }" />
+                                <Setter Property="Foreground" Value="#FFF" />
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource Secondary}" />
+                                <Setter Property="Foreground" Value="#FFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="BtnWindow" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{StaticResource SolidBorderBrush}" />
@@ -304,7 +339,7 @@
             <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Click="ButtonMin_Click" Content="―"  Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" ></Button>
                 <Button Content="▢" Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" Click="ButtonMax_Click"  ></Button>
-                <Button Content="🗙"  Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" Click="ButtonClose_Click"  ></Button>
+                <Button Content="🗙"  Width="40" Height="Auto"   Style="{StaticResource BtnWindowClose}" Click="ButtonClose_Click"  ></Button>
             </StackPanel>
         </Border>
 
