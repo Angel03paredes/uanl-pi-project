@@ -43,6 +43,7 @@ namespace PI
         Bitmap bitmap;
         Bitmap bitmapClean;
         List<Bitmap> listBitamp = new List<Bitmap>();
+        
         EnumFiltros FiltroVideo = EnumFiltros.None;
 
         VideoCapture capture;
@@ -54,6 +55,7 @@ namespace PI
         Boolean saveVideo = false;
         Guid nameTempVideo;
         System.Drawing.Size vp;
+        Process progressBar;
         public MainWindow()
         {
             InitializeComponent();
@@ -155,7 +157,8 @@ namespace PI
                                 {
                                     HandlerControlers(Visibility.Visible);
                                 });
-                                ReadAllFrames();
+                                ConvertToList();
+                              //  ReadAllFrames();
                             }
                             else
                             {
@@ -189,7 +192,44 @@ namespace PI
             }
         }
 
-        
+        private async void ConvertToList()
+        {
+            
+            await Task.Run(() => {
+                var factor = 100 / TotalFrame;
+                
+                Dispatcher.Invoke(() => {
+                     progressBar = new Process();
+                    progressBar.Show();
+                });
+
+                Mat m = new Mat();
+                // int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
+                int i = 0;
+                while (isVideo == true && i < TotalFrame)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        i++;
+                        progressBar.ChangueValue(factor * i);
+                        // Int16.Parse(cmbSpeed.Text); //Convert.ToInt16(numericUpDown1.Value);
+                    });
+
+                    capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, i);
+                    m = capture.QuerySmallFrame();
+                    if (m != null)
+                    {
+                        Bitmap bmpi = m.ToImage<Bgr, Byte>().ToBitmap();
+                        listBitamp.Add(bmpi);
+                    }
+                
+                }
+                progressBar.CloseModal();
+            });
+
+        }
+
+
 
         //Useless
         private async void videoTemp()
@@ -230,7 +270,7 @@ namespace PI
 
         private  async void ReadAllFrames()
         {
-            await Task.Run(async () =>
+            await Task.Run( () =>
             {
 
             try

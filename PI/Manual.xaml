@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PI"
         mc:Ignorable="d"
         Title="Manual" Height="450" Width="800"
-        WindowStyle="None" Background="#232322" BorderThickness="3" BorderBrush="#2D2D2C" AllowsTransparency="True" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen">
+        WindowStyle="None" Background="#232322" BorderThickness="1" BorderBrush="#1C82FE" AllowsTransparency="True" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <SolidColorBrush x:Key="Primary" Color="#232322"/>
         <SolidColorBrush x:Key="Secondary" Color="#2D2D2C"/>
@@ -132,19 +132,21 @@
         </Grid.RowDefinitions>
        
 
-        <Border MouseDown="Window_MouseDown" Grid.Row="0" Grid.ColumnSpan="2" Background="{StaticResource Primary}">
+        <Grid MouseDown="Window_MouseDown" Grid.Row="0" Grid.ColumnSpan="2" Background="{StaticResource Primary}">
+            <TextBlock FontSize="18" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource Font2}" FontFamily="Matura MT Script Capitals">Bit Editor</TextBlock>
             <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Click="ButtonMin_Click" Content="―"  Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" ></Button>
                 <Button Content="▢" Width="40" Height="Auto"   Style="{StaticResource BtnWindow}" Click="ButtonMax_Click"  ></Button>
                 <Button Content="🗙"  Width="40" Height="Auto"   Style="{StaticResource BtnWindowClose}" Click="ButtonClose_Click"  ></Button>
             </StackPanel>
-        </Border>
+        </Grid>
 
        
         <!-- Image -->
         <Grid Grid.Row="1"  Background="{StaticResource Primary}">
 
             <Label Content="Manual" FontSize="22" Foreground="{StaticResource Font1}"></Label>
+          
 
         </Grid>
        
