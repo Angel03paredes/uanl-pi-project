@@ -43,7 +43,8 @@ namespace PI
         Bitmap bitmap;
         Bitmap bitmapClean;
         List<Bitmap> listBitamp = new List<Bitmap>();
-        
+        List<Bitmap> tempListBitmap = new List<Bitmap>();
+
         EnumFiltros FiltroVideo = EnumFiltros.None;
 
         VideoCapture capture;
@@ -105,7 +106,7 @@ namespace PI
 
             try
             {
-                await Task.Run(() => {
+                await Task.Run(async() => {
                     Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
                     dlg.InitialDirectory = "c:\\";
                     dlg.Filter = "Files |*.jpg;*.png;*.mp4|JPG (*.jpg)|*.jpg|PNG(*.png)|*.png|MP4(*.mp4)|*.mp4|All Files (*.*)|*.*";
@@ -126,10 +127,10 @@ namespace PI
                         if (ext == ".mp4" || ext == ".mpeg")
                         {
 
-                            if (capture != null && !isVideoPause)
+                            if (capture != null && !isVideoPause )
                             {
-                                System.Windows.MessageBox.Show("Pausa el video antes de importar","Aviso",MessageBoxButton.OK,MessageBoxImage.Warning);
-                                goto Finish;
+                                isVideoPause = false;
+                                Stop_Click(sender, e);
                             }
                             VideoCapture captureTemp = new VideoCapture(selectedFileName);
                             var vpSet = captureTemp.QuerySmallFrame();
@@ -139,7 +140,7 @@ namespace PI
 
                             if ((vpSet.Width * 2) < 650)
                             {
-                                listBitamp.Clear();
+                                //listBitamp.Clear();
                                 listBitamp = new List<Bitmap>();
                                 Dispatcher.Invoke(() => {
                                     BtnReplay.Visibility = Visibility.Hidden;
@@ -157,8 +158,9 @@ namespace PI
                                 {
                                     HandlerControlers(Visibility.Visible);
                                 });
-                                ConvertToList();
-                              //  ReadAllFrames();
+                            
+                               ConvertToList();
+                               //ReadAllFrames();
                             }
                             else
                             {
@@ -180,8 +182,7 @@ namespace PI
                             ShowHistograma();
                        
                         }
-                    Finish:
-                        System.Diagnostics.Debug.WriteLine("Salta el proceso de importar video");
+                  
                     }
 
                 });
@@ -224,7 +225,9 @@ namespace PI
                     }
                 
                 }
+                tempListBitmap = listBitamp;
                 progressBar.CloseModal();
+                ReadAllFrames();
             });
 
         }
@@ -232,71 +235,39 @@ namespace PI
 
 
         //Useless
-        private async void videoTemp()
-        {
-            await Task.Run(() =>
-            {
-                try
-                {
-                    VideoCapture videoTemp = capture;
-                    nameTempVideo = Guid.NewGuid();
-                    VideoWriter VideoW = new VideoWriter("C:/Users/angel/Desktop/PI/PI/PI/videos/"+nameTempVideo.ToString()+ ".mp4",
-                                   VideoWriter.Fourcc('M', 'P', '4', 'V'),
-                                    Convert.ToInt32(Fps),
-                                  new System.Drawing.Size(vp.Width, vp.Height),
-                                   true);
-                    Mat m ;
-                    var frameNoVideoW = 0;
-                    while (frameNoVideoW < TotalFrame)
-                    {
-                        frameNoVideoW += 1;
 
-                        videoTemp.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, frameNoVideoW);
-                        m = videoTemp.QuerySmallFrame();
-                        if (m != null)
-                        {
-                            VideoW.Write(m);
-                        }
-
-                    }
-                    videoTemp = null;
-                }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show(ex.ToString());
-                }
-            });
-        }
 
         private  async void ReadAllFrames()
         {
-            await Task.Run( () =>
+            await Task.Run( async () =>
             {
 
             try
             {
-                 Mat m = new Mat();
                     // int mult = Convert.ToInt32(TotalFrame) / Convert.ToInt32(Fps);
+                    var length = listBitamp.Count -1;
                     
-                    while (isVideo == true && FrameNo < TotalFrame)
+                    while (isVideo == true && FrameNo < length)
                     {
                         Dispatcher.Invoke(() =>
                         {
                             FrameNo += Int16.Parse( cmbSpeed.Text); //Convert.ToInt16(numericUpDown1.Value);
                         });
-                       
 
 
-                        capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, FrameNo);
-                        m = capture.QuerySmallFrame();
-                        if (m != null)
+
+                        // capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.PosFrames, FrameNo);
+                        // m = capture.QuerySmallFrame();
+                        //  if (m != null)
+                        //  {
+
+                        if (FrameNo< length)
                         {
 
-
-                            Bitmap bmpi = m.ToImage<Bgr, Byte>().ToBitmap();
-                            Bitmap newBitmap = new Bitmap(100,100);
-                            // Bitmap filBmp =  Filtros.Sobel(bmpi);
-                            switch(FiltroVideo){
+                            Bitmap bmpi = (Bitmap)listBitamp[FrameNo].Clone(); //m.ToImage<Bgr, Byte>().ToBitmap();
+                            Bitmap newBitmap = new Bitmap(100, 100);
+                            switch (FiltroVideo)
+                            {
                                 case EnumFiltros.Sepia:
                                     newBitmap = Filtros.Sepia(bmpi);
                                     break;
@@ -313,38 +284,34 @@ namespace PI
                                     newBitmap = Filtros.Laplaciano(bmpi);
                                     break;
                                 default:
-                                   newBitmap = (Bitmap)bmpi.Clone();
+                                    newBitmap = (Bitmap)bmpi.Clone();
                                     break;
                             }
-                            
-                                listBitamp.Add(newBitmap);
-                            
+
+                            listBitamp[FrameNo] = newBitmap;
+
                             ShowHistograma((Bitmap)newBitmap.Clone());
                             this.Dispatcher.Invoke(() =>
                             {
-                                if(newBitmap != null)
+                                if (newBitmap != null)
                                     ImageEdit.Source = Helpers.Convert(newBitmap);
                             });
 
-                         //  await Task.Delay(1000 / Convert.ToInt16(Fps ));
+
+                            await Task.Delay(1000 / Convert.ToInt16(Fps));
                         }
                         else
-                        {
-                            isVideo = false;
-
-                        }
-
-                        if(FrameNo + 1 >= TotalFrame)
                         {
                             Dispatcher.Invoke(() =>
                             {
                                 BtnReplay.Visibility = Visibility.Visible;
                             });
                             }
-                    }
 
-              
-            }
+                    
+
+                    }
+                }
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.ToString());
@@ -481,7 +448,7 @@ namespace PI
                 isVideoPause = false;
                 isVideo = true;
                 FrameNo = 0;
-            listBitamp = new List<Bitmap>();
+           // listBitamp = new List<Bitmap>();
             BtnReplay.Visibility = Visibility.Hidden;
             ReadAllFrames();
           
@@ -667,7 +634,7 @@ namespace PI
             }
             else
             {
-                listBitamp = new List<Bitmap>();
+                listBitamp = tempListBitmap;
                 FiltroVideo = EnumFiltros.None;
                 listFilters.Items.Clear();
             }
