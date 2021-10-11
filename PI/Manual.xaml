@@ -130,7 +130,7 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-       
+
 
         <Grid MouseDown="Window_MouseDown" Grid.Row="0" Grid.ColumnSpan="2" Background="{StaticResource Primary}">
             <TextBlock FontSize="18" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource Font2}" FontFamily="Matura MT Script Capitals">Bit Editor</TextBlock>
@@ -141,15 +141,17 @@
             </StackPanel>
         </Grid>
 
-       
+
         <!-- Image -->
         <Grid Grid.Row="1"  Background="{StaticResource Primary}">
 
-            <Label Content="Manual" FontSize="22" Foreground="{StaticResource Font1}"></Label>
-          
+            <Label Content="Manual" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="22" Foreground="{StaticResource Font1}"></Label>
+            <Label Content="https://angel03paredes.github.io/uanl-pi-page/#/manual" FontSize="18" Foreground="{StaticResource Font2}" HorizontalAlignment="Left" Margin="108,10,0,0" VerticalAlignment="Top"/>
+            <Image Source="./image/page.png" HorizontalAlignment="Center" Height="218" Margin="0,0,0,0" VerticalAlignment="Center" Width="518"/>
+
 
         </Grid>
-       
+
 
     </Grid>
 </Window>

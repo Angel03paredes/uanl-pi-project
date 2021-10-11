@@ -25,6 +25,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
+using System.Diagnostics;
 
 namespace PI
 {
@@ -91,8 +92,10 @@ namespace PI
 
         private void BtnManual_Click(object sender,RoutedEventArgs e)
         {
-             Manual window = new Manual();
+            Manual window = new Manual();
              window.ShowDialog();
+            
+           
 
         }
         private void BtnCamara_Click(object sender, RoutedEventArgs e)

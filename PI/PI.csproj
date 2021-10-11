@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="image\page.png" />
     <None Remove="image\play.png" />
     <None Remove="image\reload.png" />
     <None Remove="image\stop.png" />
@@ -27,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="image\page.png" />
     <Resource Include="image\play.png" />
     <Resource Include="image\reload.png" />
     <Resource Include="image\stop.png" />

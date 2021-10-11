@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,9 +22,14 @@ namespace PI
     {
         public Manual()
         {
-            Dispatcher.Invoke(() => {
+           
                 InitializeComponent();
+            System.Diagnostics.Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://angel03paredes.github.io/uanl-pi-page/#/manual",
+                UseShellExecute = true
             });
+
         }
 
        
