@@ -168,7 +168,7 @@ namespace PI
                 { -1,-2,-1}
             };
 
-            Bitmap gray = EscalaDeGrises(bitmap);
+            Bitmap gray = EscalaDeGrises((Bitmap)bitmap.Clone());
             Bitmap sobel = Helpers.BorderBitmap(sobelMat, gray, 0, 255);
             return sobel;
 
@@ -182,7 +182,7 @@ namespace PI
                 { 1,1,1}
            };
 
-            Bitmap gray = EscalaDeGrises(bitmap);
+            Bitmap gray = EscalaDeGrises((Bitmap)bitmap.Clone());
             Bitmap sobel = Helpers.BorderBitmap(sobelMat, gray, 32, 64);
             return sobel;
         }

@@ -192,7 +192,7 @@ namespace PI
 
                             HandlerControlers(Visibility.Hidden);
                             Dispatcher.Invoke(() => { ImageEdit.Source = Helpers.Convert(bitmap); });
-                            ShowHistograma();
+                            ShowHistograma((Bitmap)bitmap.Clone());
                        
                         }
                   
@@ -512,7 +512,7 @@ namespace PI
                                 {
                                     ImageEdit.Source = Helpers.Convert(bmpSepia);
                                 });
-                                ShowHistograma();
+                                ShowHistograma((Bitmap)bitmap.Clone());
                                 AddItemList("Sepia");
 
                                 break;
@@ -526,7 +526,7 @@ namespace PI
                                 {
                                     ImageEdit.Source = Helpers.Convert(bmpNeg);
                                 });
-                                ShowHistograma();
+                                ShowHistograma((Bitmap)bitmap.Clone());
                                 AddItemList("Negativo");
 
                                 break;
@@ -538,7 +538,7 @@ namespace PI
                                 {
                                     ImageEdit.Source = Helpers.Convert(bmpGlitch);
                                 });
-                                ShowHistograma();
+                                ShowHistograma((Bitmap)bitmap.Clone());
                                 AddItemList("Glitch");
                                 break;
 
@@ -549,7 +549,7 @@ namespace PI
                                 {
                                     ImageEdit.Source = Helpers.Convert(bmpEdG);
                                 });
-                                ShowHistograma();
+                                ShowHistograma((Bitmap)bitmap.Clone());
                                 AddItemList("Escala de grises");
                                 break;
 
@@ -560,7 +560,7 @@ namespace PI
                                 {
                                     ImageEdit.Source = Helpers.Convert(bmpSobel);
                                 });
-                                ShowHistograma();
+                                ShowHistograma((Bitmap)bitmap.Clone());
                                 AddItemList("Sobel");
                                 break;
 
@@ -571,7 +571,7 @@ namespace PI
                                 {
                                     ImageEdit.Source = Helpers.Convert(bmpLaplace);
                                 });
-                                ShowHistograma();
+                                ShowHistograma((Bitmap)bitmap.Clone());
                                 AddItemList("Laplaciano");
                                 break;
                         }
@@ -634,14 +634,14 @@ namespace PI
         }
 
 
-        private  async void ShowHistograma(Bitmap BitVideo = null)
+        private  async void ShowHistograma(Bitmap BitVideo )
         {
             await Task.Run(() => {
                 try
                 {
                     Mat imga;
                     if (bitmap != null)
-                        imga = bitmap.ToMat();
+                        imga = BitVideo.ToMat();
                     else
                         imga = BitVideo.ToMat();
 
@@ -698,7 +698,7 @@ namespace PI
             {
                 bitmap = (Bitmap)bitmapClean.Clone();
                 ImageEdit.Source = Helpers.Convert(bitmap);
-                ShowHistograma();
+                ShowHistograma(bitmap);
                 listFilters.Items.Clear();
             }
             else
