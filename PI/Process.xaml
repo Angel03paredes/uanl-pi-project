@@ -9,7 +9,8 @@
         WindowStyle="None" Background="#232322" BorderThickness="1" BorderBrush="#1C82FE" AllowsTransparency="True"  WindowStartupLocation="CenterScreen">
     <Grid>
         <TextBlock FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" Foreground="#99FFFFFF">Procesando...</TextBlock>
-        <ProgressBar Minimum="0" Name="progressBar" Maximum="100"  HorizontalAlignment="Center" Height="10" Margin="0,0,0,0" VerticalAlignment="Center" Width="200"/>
+        <ProgressBar Minimum="0" Foreground="#1C82FE" Name="progressBar" Maximum="100"  HorizontalAlignment="Center" Height="10" Margin="0,0,0,0" VerticalAlignment="Center" IsIndeterminate="False"  Width="200"/>
+      
 
     </Grid>
 </Window>

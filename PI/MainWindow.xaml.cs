@@ -34,6 +34,7 @@ namespace PI
     /// </summary>
     public partial class MainWindow : Window
     {
+        
         //private IVideoSource _videoSource;
         BitmapImage play = new BitmapImage(new Uri("./image/play.png", UriKind.Relative));
         BitmapImage pause = new BitmapImage(new Uri("./image/stop.png", UriKind.Relative));
@@ -55,6 +56,7 @@ namespace PI
         Boolean isVideo = false;
         Boolean isVideoPause = false;
         Boolean saveVideo = false;
+        Boolean isVideoFilter = false;
         Guid nameTempVideo;
         System.Drawing.Size vp;
         Process progressBar;
@@ -63,7 +65,7 @@ namespace PI
             InitializeComponent();
             cmbSpeed.SelectedIndex = 0;
             HandlerControlers(Visibility.Hidden);
- 
+           
            
         }
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -110,6 +112,11 @@ namespace PI
             try
             {
                 await Task.Run(async() => {
+                    if (capture != null && !isVideoPause)
+                    {
+                        isVideoPause = false;
+                        Stop_Click(sender, e);
+                    }
                     Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
                     dlg.InitialDirectory = "c:\\";
                     dlg.Filter = "Files |*.jpg;*.png;*.mp4|JPG (*.jpg)|*.jpg|PNG(*.png)|*.png|MP4(*.mp4)|*.mp4|All Files (*.*)|*.*";
@@ -155,6 +162,7 @@ namespace PI
                                 FrameNo = 0;
                                 bitmap = null;
                                 isVideo = true;
+                                isVideoFilter = true;
                                 saveVideo = true;
                                 capture = captureTemp;
                                 Dispatcher.Invoke(() =>
@@ -175,7 +183,9 @@ namespace PI
                         }
                         else
                         {
+                           
                             isVideo = false;
+                            isVideoFilter = false;
                             saveVideo = false;
                             bitmap = new Bitmap(selectedFileName);
                             bitmapClean = (Bitmap)bitmap.Clone();
@@ -198,12 +208,13 @@ namespace PI
 
         private async void ConvertToList()
         {
-            
+          
             await Task.Run(() => {
                 var factor = 100 / TotalFrame;
-                
+              
                 Dispatcher.Invoke(() => {
-                     progressBar = new Process();
+                    this.IsEnabled = false;
+                    progressBar = new Process(false);
                     progressBar.Show();
                 });
 
@@ -230,6 +241,10 @@ namespace PI
                 }
                 tempListBitmap = listBitamp;
                 progressBar.CloseModal();
+                Dispatcher.Invoke(() =>
+                {
+                    this.IsEnabled = true;
+                });
                 ReadAllFrames();
             });
 
@@ -285,6 +300,9 @@ namespace PI
                                     break;
                                 case EnumFiltros.Laplaciano:
                                     newBitmap = Filtros.Laplaciano(bmpi);
+                                    break;
+                                case EnumFiltros.Negativo:
+                                    newBitmap = Filtros.Negativo(bmpi);
                                     break;
                                 default:
                                     newBitmap = (Bitmap)bmpi.Clone();
@@ -476,11 +494,17 @@ namespace PI
             await Task.Run(() => {
                 if (bitmap != null)
             {
-                switch (value)
+                    Dispatcher.Invoke(() => {
+                        this.IsEnabled = false;
+                        progressBar = new Process(true);
+                        progressBar.Show();
+                    });
+                    switch (value)
                 {
                     case "Sepia":
+                           
 
-                        Bitmap bmpSepia = Filtros.Sepia(bitmap);
+                            Bitmap bmpSepia = Filtros.Sepia(bitmap);
                         bitmap = bmpSepia;
                         this.Dispatcher.Invoke(() =>
                         {
@@ -488,9 +512,24 @@ namespace PI
                         });
                         ShowHistograma();
                         AddItemList("Sepia");
-                        break;
+                          
+                            break;
 
-                    case "Glitch":
+                     case "Negativo":
+
+
+                            Bitmap bmpNeg = Filtros.Negativo(bitmap);
+                            bitmap = bmpNeg;
+                            this.Dispatcher.Invoke(() =>
+                            {
+                                ImageEdit.Source = Helpers.Convert(bmpNeg);
+                            });
+                            ShowHistograma();
+                            AddItemList("Negativo");
+
+                            break;
+
+                        case "Glitch":
                         Bitmap bmpGlitch = Filtros.Glitch(bitmap);
                         bitmap = bmpGlitch;
                         this.Dispatcher.Invoke(() =>
@@ -534,39 +573,52 @@ namespace PI
                         AddItemList("Laplaciano");
                         break;
                 }
-            }
+                    Dispatcher.Invoke(() => {
+                        this.IsEnabled = true;
+                        progressBar.CloseModal();
+                    });
+                }
             else
             {
 
-                switch (value)
-                {
-                    case "Sepia":
+                    if (isVideoFilter)
+                    {
+                        switch (value)
+                        {
+                            case "Sepia":
 
-                        AddItemList("Sepia");
-                            FiltroVideo = EnumFiltros.Sepia;
-                        break;
+                                AddItemList("Sepia");
+                                FiltroVideo = EnumFiltros.Sepia;
+                                break;
 
-                    case "Glitch":
-                      
-                        AddItemList("Glitch");
-                            FiltroVideo = EnumFiltros.Glitch;
-                            break;
+                            case "Negativo":
 
-                    case "Escala de grises":
-                            FiltroVideo = EnumFiltros.EscalaDeGrises;
-                            AddItemList("Escala de grises");
-                        break;
+                                AddItemList("Negativo");
+                                FiltroVideo = EnumFiltros.Negativo;
+                                break;
 
-                    case "Sobel":
-                            FiltroVideo = EnumFiltros.Sobel;
-                            AddItemList("Sobel");
-                        break;
+                            case "Glitch":
 
-                    case "Laplaciano":
-                            FiltroVideo = EnumFiltros.Laplaciano;
-                            AddItemList("Laplaciano");
-                        break;
-                }
+                                AddItemList("Glitch");
+                                FiltroVideo = EnumFiltros.Glitch;
+                                break;
+
+                            case "Escala de grises":
+                                FiltroVideo = EnumFiltros.EscalaDeGrises;
+                                AddItemList("Escala de grises");
+                                break;
+
+                            case "Sobel":
+                                FiltroVideo = EnumFiltros.Sobel;
+                                AddItemList("Sobel");
+                                break;
+
+                            case "Laplaciano":
+                                FiltroVideo = EnumFiltros.Laplaciano;
+                                AddItemList("Laplaciano");
+                                break;
+                        }
+                    }
 
             }
             });

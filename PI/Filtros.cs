@@ -14,6 +14,7 @@ namespace PI
             int width = bitmap.Width;
             int height = bitmap.Height;
             Color p;
+
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -137,6 +138,29 @@ namespace PI
                         bitmap.SetPixel(x, y, Color.FromArgb(avg, avg, avg));
                     }
                
+            }
+            return bitmap;
+        }
+
+        public static Bitmap Negativo(Bitmap bitmap)
+        {
+            int width = bitmap.Width;
+            int height = bitmap.Height;
+            Color p;
+            for (int y = 0; y < height; y++)
+            {
+
+                for (int x = 0; x < width; x++)
+                {
+                    Color c = bitmap.GetPixel(x, y);
+
+                    int r = c.R;
+                    int g = c.G;
+                    int b = c.B;
+                  
+                    bitmap.SetPixel(x, y, Color.FromArgb(255 - r, 255 - g,  255 - b));
+                }
+
             }
             return bitmap;
         }

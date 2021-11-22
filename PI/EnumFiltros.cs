@@ -13,7 +13,8 @@ namespace PI
         EscalaDeGrises,
         Glitch,
         Sobel,
-        Laplaciano
+        Laplaciano,
+        Negativo
 
     }
 }

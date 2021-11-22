@@ -65,8 +65,8 @@
                     <Setter TargetName="Border" Property="Background" Value="#E0E0E0" />
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter TargetName="Border" Property="Background" Value="#EEEEEE" />
-                    <Setter TargetName="Border" Property="BorderBrush" Value="#AAAAAA" />
+                    <Setter TargetName="Border" Property="Background" Value="{StaticResource Secondary}" />
+                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Secondary}" />
                     <Setter Property="Foreground" Value="#888888"/>
                     <Setter TargetName="Arrow" Property="Fill" Value="#888888" />
                 </Trigger>
@@ -167,6 +167,90 @@
             <Style.Triggers>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="{x:Static GridView.GridViewScrollViewerStyleKey}"
+       TargetType="ScrollViewer">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollViewer">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <DockPanel Margin="{TemplateBinding Padding}">
+                                <ScrollViewer DockPanel.Dock="Top" Background="#F00"
+                          HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollBarVisibility="Hidden"
+                          Focusable="false">
+                                   
+                                </ScrollViewer>
+
+                                <ScrollContentPresenter Name="PART_ScrollContentPresenter"
+                                    KeyboardNavigation.DirectionalNavigation="Local"
+                                    CanContentScroll="True"
+                                    CanHorizontallyScroll="False"
+                                    CanVerticallyScroll="False" />
+                            </DockPanel>
+
+                            <ScrollBar Name="PART_HorizontalScrollBar"
+                     Orientation="Horizontal"
+                     Grid.Row="1"
+                     Maximum="{TemplateBinding ScrollableWidth}"
+                     ViewportSize="{TemplateBinding ViewportWidth}"
+                     Value="{TemplateBinding HorizontalOffset}"
+                     Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" />
+
+                            <ScrollBar Name="PART_VerticalScrollBar"
+                     Grid.Column="1"
+                     Maximum="{TemplateBinding ScrollableHeight}"
+                     ViewportSize="{TemplateBinding ViewportHeight}"
+                     Value="{TemplateBinding VerticalOffset}"
+                     Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="{x:Type ListView}" TargetType="{x:Type ListView}">
+
+            
+            <Setter Property="Template">
+                <Setter.Value>
+            <ControlTemplate TargetType="{x:Type ListView}">
+                        <Border Name="Border"
+                BorderThickness="1">
+                            <Border.Background>
+                                <SolidColorBrush Color="#2D2D2C" />
+                            </Border.Background>
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="#2D2D2C" />
+                            </Border.BorderBrush>
+                            <ScrollViewer Style="{DynamicResource
+                        {x:Static GridView.GridViewScrollViewerStyleKey}}">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                    <Trigger Property="IsEnabled" Value="true">
+                    <Setter Property="Background" Value="Blue" />
+                    </Trigger>
+
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+                   
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        
 
         <!-- SimpleStyles: ComboBoxItem -->
         <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
@@ -361,6 +445,7 @@
                     <ComboBoxItem>Escala de grises</ComboBoxItem>
                     <ComboBoxItem>Sobel</ComboBoxItem>
                     <ComboBoxItem>Laplaciano</ComboBoxItem>
+                    <ComboBoxItem>Negativo</ComboBoxItem>
                 </ComboBox>
                 <Button Style="{StaticResource BtnNav}" Width="120" Click="Importar_Click" Content="Importar"/>
                 <Button  Style="{StaticResource BtnNav}" Click="BtnCamara_Click"  Width="120" Content="Cámara"/>
@@ -437,7 +522,7 @@
                 <TextBlock Grid.Row="0" Grid.Column="1"  Text="Filtros" FontSize="14" Foreground="{StaticResource Font3}" />
                 <Button Click="Clean_Click"   Grid.Row="0" Grid.Column="2" Style="{StaticResource BtnNav}"   Content="Limpiar" FontSize="14"  />
 
-                <ListView Name="listFilters" Grid.Row="1" Grid.ColumnSpan="3" Background="{StaticResource Secondary}" Margin="5" Padding="5 ,5,5,5" BorderBrush="Transparent"/>
+                <ListView Name="listFilters" Grid.Row="1" Grid.ColumnSpan="3" IsEnabled="True" Background="{StaticResource Secondary}" Margin="5,5,6,5" Padding="5 ,5,5,5"  BorderBrush="Red"/>
             </Grid>
 
         </Border>

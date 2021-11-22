@@ -19,9 +19,14 @@ namespace PI
     /// </summary>
     public partial class Process : Window
     {
-        public Process()
+        
+        public Process(Boolean isIndeterminate)
         {
             InitializeComponent();
+            if (isIndeterminate)
+            {
+                progressBar.IsIndeterminate = true;
+            }
         }
         public void ChangueValue(Double val)
         {
