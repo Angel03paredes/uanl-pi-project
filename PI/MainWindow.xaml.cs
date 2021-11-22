@@ -492,135 +492,142 @@ namespace PI
              ComboBoxItem typeItem = (ComboBoxItem)AddFilters.SelectedItem;
             var value = typeItem.Content;
             await Task.Run(() => {
-                if (bitmap != null)
-            {
-                    Dispatcher.Invoke(() => {
-                        this.IsEnabled = false;
-                        progressBar = new Process(true);
-                        progressBar.Show();
-                    });
-                    switch (value)
+                try
                 {
-                    case "Sepia":
-                           
-
-                            Bitmap bmpSepia = Filtros.Sepia(bitmap);
-                        bitmap = bmpSepia;
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            ImageEdit.Source = Helpers.Convert(bmpSepia);
-                        });
-                        ShowHistograma();
-                        AddItemList("Sepia");
-                          
-                            break;
-
-                     case "Negativo":
-
-
-                            Bitmap bmpNeg = Filtros.Negativo(bitmap);
-                            bitmap = bmpNeg;
-                            this.Dispatcher.Invoke(() =>
-                            {
-                                ImageEdit.Source = Helpers.Convert(bmpNeg);
-                            });
-                            ShowHistograma();
-                            AddItemList("Negativo");
-
-                            break;
-
-                        case "Glitch":
-                        Bitmap bmpGlitch = Filtros.Glitch(bitmap);
-                        bitmap = bmpGlitch;
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            ImageEdit.Source = Helpers.Convert(bmpGlitch);
-                        });
-                        ShowHistograma();
-                        AddItemList("Glitch");
-                        break;
-
-                    case "Escala de grises":
-                        Bitmap bmpEdG = Filtros.EscalaDeGrises(bitmap);
-                        bitmap = bmpEdG;
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            ImageEdit.Source = Helpers.Convert(bmpEdG);
-                        });
-                        ShowHistograma();
-                        AddItemList("Escala de grises");
-                        break;
-
-                    case "Sobel":
-                        Bitmap bmpSobel = Filtros.Sobel(bitmap);
-                        bitmap = bmpSobel;
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            ImageEdit.Source = Helpers.Convert(bmpSobel);
-                        });
-                        ShowHistograma();
-                        AddItemList("Sobel");
-                        break;
-
-                    case "Laplaciano":
-                        Bitmap bmpLaplace = Filtros.Laplaciano(bitmap);
-                        bitmap = bmpLaplace;
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            ImageEdit.Source = Helpers.Convert(bmpLaplace);
-                        });
-                        ShowHistograma();
-                        AddItemList("Laplaciano");
-                        break;
-                }
-                    Dispatcher.Invoke(() => {
-                        this.IsEnabled = true;
-                        progressBar.CloseModal();
-                    });
-                }
-            else
-            {
-
-                    if (isVideoFilter)
+                    if (bitmap != null)
                     {
+                        Dispatcher.Invoke(() => {
+                            this.IsEnabled = false;
+                            progressBar = new Process(true);
+                            progressBar.Show();
+                        });
                         switch (value)
                         {
                             case "Sepia":
 
+
+                                Bitmap bmpSepia = Filtros.Sepia(bitmap);
+                                bitmap = bmpSepia;
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    ImageEdit.Source = Helpers.Convert(bmpSepia);
+                                });
+                                ShowHistograma();
                                 AddItemList("Sepia");
-                                FiltroVideo = EnumFiltros.Sepia;
+
                                 break;
 
                             case "Negativo":
 
+
+                                Bitmap bmpNeg = Filtros.Negativo(bitmap);
+                                bitmap = bmpNeg;
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    ImageEdit.Source = Helpers.Convert(bmpNeg);
+                                });
+                                ShowHistograma();
                                 AddItemList("Negativo");
-                                FiltroVideo = EnumFiltros.Negativo;
+
                                 break;
 
                             case "Glitch":
-
+                                Bitmap bmpGlitch = Filtros.Glitch(bitmap);
+                                bitmap = bmpGlitch;
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    ImageEdit.Source = Helpers.Convert(bmpGlitch);
+                                });
+                                ShowHistograma();
                                 AddItemList("Glitch");
-                                FiltroVideo = EnumFiltros.Glitch;
                                 break;
 
                             case "Escala de grises":
-                                FiltroVideo = EnumFiltros.EscalaDeGrises;
+                                Bitmap bmpEdG = Filtros.EscalaDeGrises(bitmap);
+                                bitmap = bmpEdG;
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    ImageEdit.Source = Helpers.Convert(bmpEdG);
+                                });
+                                ShowHistograma();
                                 AddItemList("Escala de grises");
                                 break;
 
                             case "Sobel":
-                                FiltroVideo = EnumFiltros.Sobel;
+                                Bitmap bmpSobel = Filtros.Sobel(bitmap);
+                                bitmap = bmpSobel;
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    ImageEdit.Source = Helpers.Convert(bmpSobel);
+                                });
+                                ShowHistograma();
                                 AddItemList("Sobel");
                                 break;
 
                             case "Laplaciano":
-                                FiltroVideo = EnumFiltros.Laplaciano;
+                                Bitmap bmpLaplace = Filtros.Laplaciano(bitmap);
+                                bitmap = bmpLaplace;
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    ImageEdit.Source = Helpers.Convert(bmpLaplace);
+                                });
+                                ShowHistograma();
                                 AddItemList("Laplaciano");
                                 break;
                         }
+                        Dispatcher.Invoke(() => {
+                            this.IsEnabled = true;
+                            progressBar.CloseModal();
+                        });
                     }
+                    else
+                    {
 
-            }
+                        if (isVideoFilter)
+                        {
+                            switch (value)
+                            {
+                                case "Sepia":
+
+                                    AddItemList("Sepia");
+                                    FiltroVideo = EnumFiltros.Sepia;
+                                    break;
+
+                                case "Negativo":
+
+                                    AddItemList("Negativo");
+                                    FiltroVideo = EnumFiltros.Negativo;
+                                    break;
+
+                                case "Glitch":
+
+                                    AddItemList("Glitch");
+                                    FiltroVideo = EnumFiltros.Glitch;
+                                    break;
+
+                                case "Escala de grises":
+                                    FiltroVideo = EnumFiltros.EscalaDeGrises;
+                                    AddItemList("Escala de grises");
+                                    break;
+
+                                case "Sobel":
+                                    FiltroVideo = EnumFiltros.Sobel;
+                                    AddItemList("Sobel");
+                                    break;
+
+                                case "Laplaciano":
+                                    FiltroVideo = EnumFiltros.Laplaciano;
+                                    AddItemList("Laplaciano");
+                                    break;
+                            }
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show("Ha ocurrido un error" + ex.ToString());
+                }
             });
             AddFilters.SelectedIndex = 0;
         
@@ -630,51 +637,58 @@ namespace PI
         private  async void ShowHistograma(Bitmap BitVideo = null)
         {
             await Task.Run(() => {
-                Mat imga;
-                if (bitmap != null)
-                    imga = bitmap.ToMat();
-                else
-                    imga = BitVideo.ToMat();
-
-                Image<Bgr, Byte> imgHist = imga.ToImage<Bgr, Byte>(); // imga.ToImage<Bgr, Byte>().ToBitmap();
-
-                Image<Gray, Byte> imgBlue = imgHist[0];
-                Image<Gray, Byte> imgGreen = imgHist[1];
-                Image<Gray, Byte> imgRed = imgHist[2];
-
-
-                DenseHistogram histR = new DenseHistogram(256, new RangeF(0, 255));
-                histR.Calculate(new Image<Gray, byte>[] { imgRed }, false, null);
-                Mat mR = new Mat();
-                histR.CopyTo(mR);
-                histogramR.ClearHistogram();
-                Mat mHistR = histogramR.GenerateHistogram("RED", System.Drawing.Color.Red, mR, 256, new float[] { 0, 256 });
-                Dispatcher.Invoke(() =>
+                try
                 {
-                    imageHistR.Source = Helpers.Convert(mHistR.ToImage<Bgr, Byte>().ToBitmap());
-                });
+                    Mat imga;
+                    if (bitmap != null)
+                        imga = bitmap.ToMat();
+                    else
+                        imga = BitVideo.ToMat();
 
-                DenseHistogram histG = new DenseHistogram(256, new RangeF(0, 255));
-                histG.Calculate(new Image<Gray, byte>[] { imgGreen }, false, null);
-                Mat mG = new Mat();
-                histG.CopyTo(mG);
-                histogramG.ClearHistogram();
-                Mat mHistG = histogramR.GenerateHistogram("GREEN", System.Drawing.Color.Green, mG, 256, new float[] { 0, 256 });
-                Dispatcher.Invoke(() =>
-                {
-                    imageHistG.Source = Helpers.Convert(mHistG.ToImage<Bgr, Byte>().ToBitmap());
-                });
+                    Image<Bgr, Byte> imgHist = imga.ToImage<Bgr, Byte>(); // imga.ToImage<Bgr, Byte>().ToBitmap();
 
-                DenseHistogram histB = new DenseHistogram(256, new RangeF(0, 255));
-                histB.Calculate(new Image<Gray, byte>[] { imgBlue }, false, null);
-                Mat mB = new Mat();
-                histB.CopyTo(mB);
-                histogramB.ClearHistogram();
-                Mat mHistB = histogramR.GenerateHistogram("BLUE", System.Drawing.Color.Blue, mB, 256, new float[] { 0, 256 });
-                Dispatcher.Invoke(() =>
+                    Image<Gray, Byte> imgBlue = imgHist[0];
+                    Image<Gray, Byte> imgGreen = imgHist[1];
+                    Image<Gray, Byte> imgRed = imgHist[2];
+
+
+                    DenseHistogram histR = new DenseHistogram(256, new RangeF(0, 255));
+                    histR.Calculate(new Image<Gray, byte>[] { imgRed }, false, null);
+                    Mat mR = new Mat();
+                    histR.CopyTo(mR);
+                    histogramR.ClearHistogram();
+                    Mat mHistR = histogramR.GenerateHistogram("RED", System.Drawing.Color.Red, mR, 256, new float[] { 0, 256 });
+                    Dispatcher.Invoke(() =>
+                    {
+                        imageHistR.Source = Helpers.Convert(mHistR.ToImage<Bgr, Byte>().ToBitmap());
+                    });
+
+                    DenseHistogram histG = new DenseHistogram(256, new RangeF(0, 255));
+                    histG.Calculate(new Image<Gray, byte>[] { imgGreen }, false, null);
+                    Mat mG = new Mat();
+                    histG.CopyTo(mG);
+                    histogramG.ClearHistogram();
+                    Mat mHistG = histogramR.GenerateHistogram("GREEN", System.Drawing.Color.Green, mG, 256, new float[] { 0, 256 });
+                    Dispatcher.Invoke(() =>
+                    {
+                        imageHistG.Source = Helpers.Convert(mHistG.ToImage<Bgr, Byte>().ToBitmap());
+                    });
+
+                    DenseHistogram histB = new DenseHistogram(256, new RangeF(0, 255));
+                    histB.Calculate(new Image<Gray, byte>[] { imgBlue }, false, null);
+                    Mat mB = new Mat();
+                    histB.CopyTo(mB);
+                    histogramB.ClearHistogram();
+                    Mat mHistB = histogramR.GenerateHistogram("BLUE", System.Drawing.Color.Blue, mB, 256, new float[] { 0, 256 });
+                    Dispatcher.Invoke(() =>
+                    {
+                        imageHistB.Source = Helpers.Convert(mHistB.ToImage<Bgr, Byte>().ToBitmap());
+                    });
+                }
+                catch( Exception ex)
                 {
-                    imageHistB.Source = Helpers.Convert(mHistB.ToImage<Bgr, Byte>().ToBitmap());
-                });
+                    System.Windows.MessageBox.Show("Ha ocurrido un error" + ex.ToString());
+                }
             });
         }
 

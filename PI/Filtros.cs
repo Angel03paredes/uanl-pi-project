@@ -19,21 +19,17 @@ namespace PI
             {
                 for (int x = 0; x < width; x++)
                 {
-                    //get pixel value
                     p = bitmap.GetPixel(x, y);
 
-                    //extract pixel component ARGB
                     int a = p.A;
                     int r = p.R;
                     int g = p.G;
                     int b = p.B;
 
-                    //calculate temp value
                     int tr = (int)(0.393 * r + 0.769 * g + 0.189 * b);
                     int tg = (int)(0.349 * r + 0.686 * g + 0.168 * b);
                     int tb = (int)(0.272 * r + 0.534 * g + 0.131 * b);
 
-                    //set new RGB value
                     if (tr > 255)
                     {
                         r = 255;
@@ -61,7 +57,6 @@ namespace PI
                         b = tb;
                     }
 
-                    //set the new RGB value in image pixel
                     bitmap.SetPixel(x, y, Color.FromArgb(a, r, g, b));
                 }
             }
